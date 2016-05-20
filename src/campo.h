@@ -20,6 +20,10 @@ class Campo {
 	private:
 		Dimension _dimension;
 		Grilla<Parcela> _grilla;
+		
+		// Variables privadas que agregamos nosotros:
+		Posicion _posG;
+		Posicion _posC;
 };
 
 // Definirlo usando mostrar, para poder usar << con este tipo.
