@@ -6,7 +6,7 @@ Campo::Campo()
 
 Campo::Campo(const Posicion &posG, const Posicion &posC)
 {
-	// Verificar que no sean iguales posC y posG
+	// Revisarlo para que se cumpla el invariante posicionesAlcanzables
 	
 	//
 
