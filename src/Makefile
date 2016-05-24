@@ -15,4 +15,4 @@ drone.o: drone.h drone.cpp
 	g++ -g -Wall -c drone.cpp
 
 sistema.o: sistema.h sistema.cpp
-		g++ -g -Wall -c sistema.cpp
+	g++ -g -Wall -c sistema.cpp

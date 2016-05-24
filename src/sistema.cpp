@@ -7,11 +7,26 @@ Sistema::Sistema()
 
 Sistema::Sistema(const Campo & c, const Secuencia<Drone>& ds)
 {
+	_campo = c;
+	Dimension dim = _campo.dimensiones();
+
+	// revisar/preguntar porque no podemos pasarle las dimensiones a Grilla
+	_estado = Grilla<EstadoCultivo>();
+
+	int i = 0;
+	while (i < dim.ancho) {
+		int j = 0;
+		while (j < dim.largo) {
+			_estado.parcelas[i][j] = NoSensado;
+		}
+	}
+
+	_enjambre = ds;
 }
 
 const Campo & Sistema::campo() const
 {
-	return Campo();
+	return _campo;
 }
 
 EstadoCultivo Sistema::estadoDelCultivo(const Posicion & p) const
@@ -21,7 +36,7 @@ EstadoCultivo Sistema::estadoDelCultivo(const Posicion & p) const
 
 const Secuencia<Drone>& Sistema::enjambreDrones() const
 {
-	return Secuencia<Drone>();
+	return _enjambre;
 }
 
 void Sistema::crecer()
