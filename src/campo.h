@@ -20,7 +20,7 @@ class Campo {
 	private:
 		Dimension _dimension;
 		Grilla<Parcela> _grilla;
-		
+
 		// Variables privadas que agregamos nosotros:
 		Posicion _posG;
 		Posicion _posC;
@@ -31,4 +31,5 @@ std::ostream & operator<<(std::ostream & os, const Campo & c);
 std::ostream & operator<<(std::ostream & os, const Parcela & p);
 std::ostream & operator<<(std::ostream & os, const Producto & p);
 std::ostream & operator<<(std::ostream & os, const EstadoCultivo & e);
+
 #endif // CAMPO_H_INCLUDED
