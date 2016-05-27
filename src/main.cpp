@@ -16,5 +16,6 @@ int main()
 
 	Campo _c = Campo(posG, posC);
 	_c.mostrar(std::cout);
-    return 0;
+
+	return 0;
 }

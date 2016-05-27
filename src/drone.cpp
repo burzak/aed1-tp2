@@ -6,20 +6,12 @@ Drone::Drone()
 
 Drone::Drone(ID i, const std::vector<Producto>& ps)
 {
-	// v Esto lo hizo Dante, probablemente este mal
 	_id = i;
-	_bateria = 100;
+	setBateria(100);
 	_enVuelo = false;
 	_productos = ps;
 
-	//La posicion actual se guarda aca?
-	//No deberia guardarse en trayectoria.
-
-	//En la especificacion no aclara nada sobre la trayectoria pero deberia
-	//tener que ser vacia.
-	_trayectoria = std::vector<Posicion>();
-	
-	// ^ Esto lo hizo Dante, probablemente este mal
+	// se inicializa posicionActual y trayectoria?
 }
 
 ID Drone::id() const
@@ -38,13 +30,13 @@ bool Drone::enVuelo() const
 }
 
 const Secuencia<Posicion>& Drone::vueloRealizado() const
-{	
+{
 	return _trayectoria;
 }
 
 Posicion Drone::posicionActual() const
 {
-	return _trayectoria[_trayectoria.size() - 1];
+	return _posicionActual;
 }
 
 const Secuencia<Producto>& Drone::productosDisponibles() const
@@ -70,7 +62,7 @@ const Secuencia<Producto>& Drone::productosDisponibles() const
 		while (i+2 <= (int) _trayectoria.size()) {
 			int coord1 = (_trayectoria[i+2].x - _trayectoria[i].x);
 			int coord2 = (_trayectoria[i+2].y - _trayectoria[i].y);
-			
+
 			res = res && (distanciaX == coord1 && distanciaY == coord2);
 			i++;
 		}
@@ -113,6 +105,31 @@ void Drone::guardar(std::ostream & os) const
 
 void Drone::cargar(std::istream & is)
 {
+}
+
+void Drone::moverA(const Posicion pos)
+{
+}
+
+void Drone::setBateria(const Carga c)
+{
+	_bateria = c;
+}
+
+void Drone::borrarVueloRealizado()
+{
+	_enVuelo = false;
+	_trayectoria = std::vector<Posicion>();
+}
+
+void Drone::cambiarPosicionActual(const Posicion p)
+{
+	_posicionActual = p;
+}
+
+void Drone::sacarProducto(const Producto p)
+{
+	_productos.erase(_productos.at(p));
 }
 
 bool Drone::operator==(const Drone & otroDrone) const
