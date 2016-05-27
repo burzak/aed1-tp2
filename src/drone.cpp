@@ -129,7 +129,14 @@ void Drone::cambiarPosicionActual(const Posicion p)
 
 void Drone::sacarProducto(const Producto p)
 {
-	_productos.erase(_productos.at(p));
+	int posicionActual;
+	unsigned n=0;
+	while (n < _productos.size()) {
+		if (_productos[n] == p) {
+			posicionActual = n;
+		}
+	}
+	_productos.erase(_productos.begin() + posicionActual);
 }
 
 bool Drone::operator==(const Drone & otroDrone) const
