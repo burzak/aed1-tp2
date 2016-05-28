@@ -63,21 +63,21 @@ bool Drone::vueloEscalerado() const
 
 Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 {
-	/*Secuencia<InfoVueloCruzado> vuelosCruzados;
-	int n = 0;
+	Secuencia<InfoVueloCruzado> vuelosCruzados;
+	unsigned int n = 0;
 	while (n < ds.size()) {
-		int j = 0;
+		unsigned int j = 0;
 		while (j < ds[n].vueloRealizado().size()) {
-			if (ds[n].cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size()) > 1) {
-				//InfoVueloCruzado info;
-				//info.posicion = ds[n].vueloRealizado()[j];
-				//info.cantidadCruces = cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size());
-				//vuelosCruzados.push_back(info);
+			if (cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size()) > 1) {
+				InfoVueloCruzado info;
+				info.posicion = ds[n].vueloRealizado()[j];
+				info.cantidadCruces = cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size());
+				vuelosCruzados.push_back(info);
 			}
 			j++;
 		}
 		n++;
-	}*/
+	}
 	return Secuencia<InfoVueloCruzado>();
 }
 
@@ -147,11 +147,11 @@ std::ostream & operator<<(std::ostream & os, const Drone & d)
 }
 
 /******************** AUX **************************/
-bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2){
+bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2) {
   bool res = lista1.size() == lista2.size();
-  int n = 0;
+  unsigned int n = 0;
   while (res && n < lista1.size()) {
-		res = res && (cantidad(lista1, n/*lista1[n]*/) == cantidad(lista2, lista1[n]));
+		res = res && (cantidad(lista1, lista1[n]) == cantidad(lista2, lista1[n]));
     res = res && (cantidad(lista1, lista2[n]) == cantidad(lista2, lista2[n]));
     n++;
   }
@@ -159,11 +159,11 @@ bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto>
   return res;
 }
 
-int Drone::cantidad(const Secuencia<Producto> lista, int indice) {
+int cantidad(const Secuencia<Producto> lista, Producto producto) {
   unsigned int n = 0;
   int cant = 0;
   while (n < lista.size()) {
-    if (lista[n] == lista[indice]) {
+    if (lista[n] == producto) {
       cant++;
     }
     n++;
@@ -171,12 +171,12 @@ int Drone::cantidad(const Secuencia<Producto> lista, int indice) {
   return cant;
 }
 
-int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
+int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
 	int n = 0;
 	int total = 0;
 	while (n < longitud) {
 		int cant = 0;
-		int j = 0;
+		unsigned int j = 0;
 		while (j < ds.size()) {
 			if (ds[j].vueloRealizado()[n] == pos) {
 				cant++;

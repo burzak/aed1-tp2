@@ -39,12 +39,12 @@ class Drone{
 				bool _enVuelo;
 				Posicion _posicionActual;
 
-        // aux creadas por nosotros
-        bool mismosProductos(Secuencia<Producto> lista1, Secuencia<Producto> lista2) const;
-        int cantidad(const Secuencia<Producto> lista, Producto producto);
-        int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud);
 
 };
+// aux creadas por nosotros
+int cantidad(const Secuencia<Producto> lista, Producto producto);
+int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud);
+bool mismosProductos(Secuencia<Producto> lista1, Secuencia<Producto> lista2);
 
 inline bool operator==(const Posicion& p1, const Posicion& p2){ return p1.x == p2.x && p1.y == p2.y; };
 // Definirlo usando mostrar, para poder usar << con este tipo.
