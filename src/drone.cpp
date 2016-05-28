@@ -63,21 +63,21 @@ bool Drone::vueloEscalerado() const
 
 Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 {
-	/*Secuencia<InfoVueloCruzado> vuelosCruzados;
-	int n = 0;
+	Secuencia<InfoVueloCruzado> vuelosCruzados;
+	unsigned int n = 0;
 	while (n < ds.size()) {
-		int j = 0;
+		unsigned int j = 0;
 		while (j < ds[n].vueloRealizado().size()) {
-			if (ds[n].cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size()) > 1) {
-				//InfoVueloCruzado info;
-				//info.posicion = ds[n].vueloRealizado()[j];
-				//info.cantidadCruces = cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size());
-				//vuelosCruzados.push_back(info);
+			if (cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size()) > 1) {
+				InfoVueloCruzado info;
+				info.posicion = ds[n].vueloRealizado()[j];
+				info.cantidadCruces = cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size());
+				vuelosCruzados.push_back(info);
 			}
 			j++;
 		}
 		n++;
-	}*/
+	}
 	return Secuencia<InfoVueloCruzado>();
 }
 
