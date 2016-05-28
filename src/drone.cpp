@@ -147,7 +147,7 @@ std::ostream & operator<<(std::ostream & os, const Drone & d)
 }
 
 /******************** AUX **************************/
-bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2) {
+bool Drone::mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2) {
   bool res = lista1.size() == lista2.size();
   unsigned int n = 0;
   while (res && n < lista1.size()) {
@@ -159,7 +159,7 @@ bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto>
   return res;
 }
 
-int cantidad(const Secuencia<Producto> lista, Producto producto) {
+int Drone::cantidad(const Secuencia<Producto> lista, Producto producto) {
   unsigned int n = 0;
   int cant = 0;
   while (n < lista.size()) {
@@ -171,7 +171,7 @@ int cantidad(const Secuencia<Producto> lista, Producto producto) {
   return cant;
 }
 
-int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
+int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
 	int n = 0;
 	int total = 0;
 	while (n < longitud) {
