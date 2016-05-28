@@ -151,7 +151,7 @@ bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto>
   bool res = lista1.size() == lista2.size();
   int n = 0;
   while (res && n < lista1.size()) {
-    res = res && (cantidad(lista1, lista1[n]) == cantidad(lista2, lista1[n]));
+		res = res && (cantidad(lista1, n/*lista1[n]*/) == cantidad(lista2, lista1[n]));
     res = res && (cantidad(lista1, lista2[n]) == cantidad(lista2, lista2[n]));
     n++;
   }
@@ -159,11 +159,11 @@ bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto>
   return res;
 }
 
-int cantidad(const Secuencia<Producto> lista, Producto producto) {
+int Drone::cantidad(const Secuencia<Producto> lista, int indice) {
   unsigned int n = 0;
   int cant = 0;
   while (n < lista.size()) {
-    if (lista[n] == producto) {
+    if (lista[n] == lista[indice]) {
       cant++;
     }
     n++;
@@ -171,7 +171,7 @@ int cantidad(const Secuencia<Producto> lista, Producto producto) {
   return cant;
 }
 
-int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
+int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
 	int n = 0;
 	int total = 0;
 	while (n < longitud) {

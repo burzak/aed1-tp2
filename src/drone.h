@@ -40,7 +40,7 @@ class Drone{
 				Posicion _posicionActual;
 
         // aux creadas por nosotros
-        bool mismosProductos(Secuencia<Producto> lista1, Secuencia<Producto> lista2);
+        bool mismosProductos(Secuencia<Producto> lista1, Secuencia<Producto> lista2) const;
         int cantidad(const Secuencia<Producto> lista, Producto producto);
         int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud);
 
