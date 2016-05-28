@@ -37,9 +37,16 @@ class Drone{
 				Secuencia<Posicion> _trayectoria;
 				Secuencia<Producto> _productos;
 				bool _enVuelo;
-				Posicion _posicionActual;                 
+				Posicion _posicionActual;
+
+        // aux creadas por nosotros
+        bool mismosProductos(Secuencia<Producto> lista1, Secuencia<Producto> lista2);
+        int cantidad(const Secuencia<Producto> lista, Producto producto);
+        int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud);
+
 };
 
+inline bool operator==(const Posicion& p1, const Posicion& p2){ return p1.x == p2.x && p1.y == p2.y; };
 // Definirlo usando mostrar, para poder usar << con este tipo.
 std::ostream & operator<<(std::ostream & os,const Drone & d);
 

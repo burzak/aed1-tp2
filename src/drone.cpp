@@ -10,8 +10,6 @@ Drone::Drone(ID i, const std::vector<Producto>& ps)
 	setBateria(100);
 	_enVuelo = false;
 	_productos = ps;
-
-	// se inicializa posicionActual y trayectoria?
 }
 
 ID Drone::id() const
@@ -44,33 +42,6 @@ const Secuencia<Producto>& Drone::productosDisponibles() const
 	return _productos;
 }
 
-/*bool Drone::vueloEscalerado() const
-{
-	bool res = _enVuelo;
-
-	//Si la cantidad de movimientos es menor a 2, siempre es escalerado
-	if (2 < _trayectoria.size()) {
-		int distanciaX = (_trayectoria[2].x - _trayectoria[0].x);
-		int distanciaY = (_trayectoria[2].y - _trayectoria[0].y);
-
-		//Compruebo que no se mueva en linea recta.
-		res = res && distanciaX != 0 && distanciaY != 0;
-
-		int i = 0;
-		//Evaluo para todos los puntos alternados que tengan la misma pendiente
-		// i + 2 para que no se vaya de rango: solo evalua con los que existen
-		while (i+2 <= (int) _trayectoria.size()) {
-			int coord1 = (_trayectoria[i+2].x - _trayectoria[i].x);
-			int coord2 = (_trayectoria[i+2].y - _trayectoria[i].y);
-
-			res = res && (distanciaX == coord1 && distanciaY == coord2);
-			i++;
-		}
-	}
-
-	return res;
-}*/
-
 bool Drone::vueloEscalerado() const
 {
 	bool res = _enVuelo;
@@ -92,6 +63,21 @@ bool Drone::vueloEscalerado() const
 
 Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 {
+	/*Secuencia<InfoVueloCruzado> vuelosCruzados;
+	int n = 0;
+	while (n < ds.size()) {
+		int j = 0;
+		while (j < ds[n].vueloRealizado().size()) {
+			if (ds[n].cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size()) > 1) {
+				//InfoVueloCruzado info;
+				//info.posicion = ds[n].vueloRealizado()[j];
+				//info.cantidadCruces = cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size());
+				//vuelosCruzados.push_back(info);
+			}
+			j++;
+		}
+		n++;
+	}*/
 	return Secuencia<InfoVueloCruzado>();
 }
 
@@ -109,6 +95,10 @@ void Drone::cargar(std::istream & is)
 
 void Drone::moverA(const Posicion pos)
 {
+	_enVuelo = true;
+	_trayectoria.push_back(pos);
+	cambiarPosicionActual(pos); // por invariante agregamos esta linea
+	// debemos verificar invariante movimientoOK? pos tiene que ser un movimiento valido?
 }
 
 void Drone::setBateria(const Carga c)
@@ -129,22 +119,74 @@ void Drone::cambiarPosicionActual(const Posicion p)
 
 void Drone::sacarProducto(const Producto p)
 {
-	int posicionActual;
+	int indiceProducto;
 	unsigned n=0;
 	while (n < _productos.size()) {
 		if (_productos[n] == p) {
-			posicionActual = n;
+			indiceProducto = n;
 		}
 	}
-	_productos.erase(_productos.begin() + posicionActual);
+	_productos.erase(_productos.begin() + indiceProducto);
 }
 
 bool Drone::operator==(const Drone & otroDrone) const
 {
-	return false;
+	bool res = true;
+	res = res && id() == otroDrone.id();
+	res = res && bateria() == otroDrone.bateria();
+	res = res && enVuelo() == otroDrone.enVuelo();
+	res = res && vueloRealizado() == otroDrone.vueloRealizado();
+	res = res && posicionActual() == otroDrone.posicionActual();
+	res = res && mismosProductos(productosDisponibles(), otroDrone.productosDisponibles());
+	return res;
 }
 
 std::ostream & operator<<(std::ostream & os, const Drone & d)
 {
 	return os;
+}
+
+/******************** AUX **************************/
+bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2){
+  bool res = lista1.size() == lista2.size();
+  int n = 0;
+  while (res && n < lista1.size()) {
+    res = res && (cantidad(lista1, lista1[n]) == cantidad(lista2, lista1[n]));
+    res = res && (cantidad(lista1, lista2[n]) == cantidad(lista2, lista2[n]));
+    n++;
+  }
+
+  return res;
+}
+
+int cantidad(const Secuencia<Producto> lista, Producto producto) {
+  unsigned int n = 0;
+  int cant = 0;
+  while (n < lista.size()) {
+    if (lista[n] == producto) {
+      cant++;
+    }
+    n++;
+  }
+  return cant;
+}
+
+int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud) {
+	int n = 0;
+	int total = 0;
+	while (n < longitud) {
+		int cant = 0;
+		int j = 0;
+		while (j < ds.size()) {
+			if (ds[j].vueloRealizado()[n] == pos) {
+				cant++;
+			}
+		}
+		if (cant > 1) {
+			total = total + cant;
+		}
+		cant = 0;
+		n++;
+	}
+	return total;
 }
