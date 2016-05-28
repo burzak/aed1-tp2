@@ -42,14 +42,14 @@ const Secuencia<Drone>& Sistema::enjambreDrones() const
 void Sistema::crecer()
 {
 	int i = 0;
-	while(i < _estado.ancho){
+	while(i < _campo.dimensiones().ancho){
 			int j = 0;
-			while (j < _estado.largo) {
-				if (_estado[i][j] == RecienSembrado){
-					_estado[i][j] == EnCrecimiento;
+			while (j < _campo.dimensiones().largo) {
+				if (_estado.parcelas[i][j] == RecienSembrado){
+					_estado.parcelas[i][j] = EnCrecimiento;
 				}
-				if (_estado[i][j] == EnCrecimiento){
-					_estado[i][j] == ListoParaCosechar;
+				if (_estado.parcelas[i][j] == EnCrecimiento){
+					_estado.parcelas[i][j] = ListoParaCosechar;
 				}
 				j++;
 			}
@@ -59,10 +59,26 @@ void Sistema::crecer()
 
 void Sistema::seVinoLaMaleza(const Secuencia<Posicion>& ps)
 {
+	unsigned int i = 0;
+	while(i < ps.size()){
+		_estado.parcelas[ps[i].x][ps[i].y] = ConMaleza;
+		i++;
+	}
 }
 
 void Sistema::seExpandePlaga()
 {
+	int i = 0;
+	while (i < _campo.dimensiones().ancho){
+		int j = 0;
+		while (j < _campo.dimensiones().largo){
+			if(enRangoConPlaga(i+1,j)||enRangoConPlaga(i-1,j)||enRangoConPlaga(i,j+1)||enRangoConPlaga(i,j-1)){
+				_estado.parcelas[i][j] = ConMaleza;
+			}
+			j++;
+		}
+		i++;
+	}
 }
 
 void Sistema::despegar(const Drone & d)
@@ -107,4 +123,15 @@ std::ostream & operator<<(std::ostream & os, const Sistema & s)
 {
 	// TODO: insert return statement here
 	return os;
+}
+
+
+
+/********************** AUX *****************************/
+bool Sistema::enRangoConPlaga(int x, int y) const{
+	bool res = true;
+	res = res && (x >= 0) && (x < _campo.dimensiones().ancho);
+	res = res && (y >= 0) && (y < _campo.dimensiones().largo);
+	res = res && _estado.parcelas[x][y] == ConPlaga;
+	return res;
 }
