@@ -32,7 +32,7 @@ class Sistema {
 
 	private:
         Campo _campo;
-		Secuencia<Drone> _enjambre;
+        Secuencia<Drone> _enjambre;
         Grilla<EstadoCultivo> _estado;
 
         // Auxiliares
@@ -46,7 +46,7 @@ class Sistema {
         static Posicion vecinoAlOeste(const Posicion &p);
 
         static bool tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar);
-        // solución --> deberíamos agregarla como funciones globales en tipos.h
+        // soluciï¿½n --> deberï¿½amos agregarla como funciones globales en tipos.h
         void split(const std::string &s, char delim, std::vector<std::string> &elems);
         std::vector<std::string> split(const std::string &s, char delim);
 };
