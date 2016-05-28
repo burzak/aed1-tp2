@@ -41,6 +41,20 @@ const Secuencia<Drone>& Sistema::enjambreDrones() const
 
 void Sistema::crecer()
 {
+	int i = 0;
+	while(i < _estado.ancho){
+			int j = 0;
+			while (j < _estado.largo) {
+				if (_estado[i][j] == RecienSembrado){
+					_estado[i][j] == EnCrecimiento;
+				}
+				if (_estado[i][j] == EnCrecimiento){
+					_estado[i][j] == ListoParaCosechar;
+				}
+				j++;
+			}
+		i++;
+	}
 }
 
 void Sistema::seVinoLaMaleza(const Secuencia<Posicion>& ps)
