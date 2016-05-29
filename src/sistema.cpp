@@ -82,7 +82,7 @@ void Sistema::seExpandePlaga()
 	}
 }
 
-void Sistema::despegar(const Drone & d)
+void Sistema::despegar(Drone & d)
 {
 	Posicion pos;
 
@@ -103,7 +103,7 @@ void Sistema::despegar(const Drone & d)
 		pos.y = d.posicionActual().y - 1;
 	}
 
-	d.moverA(const pos);
+	d.moverA(pos);
 }
 
 bool Sistema::listoParaCosechar() const
@@ -160,7 +160,7 @@ bool Sistema::enRangoConPlaga(int x, int y) const{
 bool Sistema::parcelaLibre(int x, int y) const{
 	bool res = true;
 
-	int i = 0;
+	unsigned int i = 0;
 	while (i < enjambreDrones().size()){
 		bool xDistinto = enjambreDrones()[i].posicionActual().x != x;
 		bool yDistinto = enjambreDrones()[i].posicionActual().y != y;

@@ -18,7 +18,7 @@ class Sistema {
 		void crecer();
 		void seVinoLaMaleza(const Secuencia<Posicion>& ps);
 		void seExpandePlaga();
-		void despegar(const Drone& d);
+		void despegar(Drone& d);
 		bool listoParaCosechar() const;
 		void aterrizarYCargarBaterias(Carga b);
 		void fertilizarPorFilas();
