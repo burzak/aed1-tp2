@@ -72,6 +72,7 @@ void Sistema::seExpandePlaga()
 	while (i < _campo.dimensiones().ancho){
 		int j = 0;
 		while (j < _campo.dimensiones().largo){
+			//Es necesario verificar que las parcelas vecinas existan.
 			if(enRangoConPlaga(i+1,j)||enRangoConPlaga(i-1,j)||enRangoConPlaga(i,j+1)||enRangoConPlaga(i,j-1)){
 				_estado.parcelas[i][j] = ConMaleza;
 			}
@@ -83,6 +84,26 @@ void Sistema::seExpandePlaga()
 
 void Sistema::despegar(const Drone & d)
 {
+	Posicion pos;
+
+	if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y)){
+		pos.x = d.posicionActual().x + 1;
+		pos.y = d.posicionActual().y;
+	}
+	if (parcelaLibre(d.posicionActual().x - 1, d.posicionActual().y)){
+		pos.x = d.posicionActual().x - 1;
+		pos.y = d.posicionActual().y;
+	}
+	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1)){
+		pos.x = d.posicionActual().x;
+		pos.y = d.posicionActual().y + 1;
+	}
+	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1)){
+		pos.x = d.posicionActual().x;
+		pos.y = d.posicionActual().y - 1;
+	}
+
+	d.moverA(const pos);
 }
 
 bool Sistema::listoParaCosechar() const
@@ -133,5 +154,19 @@ bool Sistema::enRangoConPlaga(int x, int y) const{
 	res = res && (x >= 0) && (x < _campo.dimensiones().ancho);
 	res = res && (y >= 0) && (y < _campo.dimensiones().largo);
 	res = res && _estado.parcelas[x][y] == ConPlaga;
+	return res;
+}
+
+bool Sistema::parcelaLibre(int x, int y) const{
+	bool res = true;
+
+	int i = 0;
+	while (i < enjambreDrones().size()){
+		bool xDistinto = enjambreDrones()[i].posicionActual().x != x;
+		bool yDistinto = enjambreDrones()[i].posicionActual().y != y;
+		res = res && (xDistinto && yDistinto);
+		i++;
+	}
+
 	return res;
 }
