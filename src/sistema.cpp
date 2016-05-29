@@ -82,7 +82,7 @@ void Sistema::seExpandePlaga()
 	}
 }
 
-void Sistema::despegar(Drone & d)
+void Sistema::despegar(const Drone & d)
 {
 	Posicion pos;
 
@@ -103,7 +103,8 @@ void Sistema::despegar(Drone & d)
 		pos.y = d.posicionActual().y - 1;
 	}
 
-	d.moverA(pos);
+	Drone droneGuardado; //hay que buscarlo
+	droneGuardado.moverA(pos);
 }
 
 bool Sistema::listoParaCosechar() const
