@@ -103,13 +103,33 @@ void Sistema::despegar(const Drone & d)
 		pos.y = d.posicionActual().y - 1;
 	}
 
-	Drone droneGuardado; //hay que buscarlo
-	droneGuardado.moverA(pos);
+	unsigned int i = 0;
+	while (i < _enjambre.size()){
+		if (_enjambre[i].id() == d.id()){
+			_enjambre[i].moverA(pos);
+		}
+		i++;
+	}
 }
 
 bool Sistema::listoParaCosechar() const
 {
-	return false;
+	int i = 0;
+	float parcelasListas = 0;
+	float cantidadParcelas = 0;
+
+	while (i < campo().dimensiones().ancho){
+		int j = 0;
+		while (j < campo().dimensiones().largo){
+			if (_estado.parcelas[i][j] == ListoParaCosechar){
+				parcelasListas++;
+			}
+			cantidadParcelas++;
+			j++;
+		}
+		i++;
+	}
+	return (parcelasListas/parcelasListas) >= 0.9;
 }
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
