@@ -142,6 +142,63 @@ void Sistema::fertilizarPorFilas()
 
 void Sistema::volarYSensar(const Drone & d)
 {
+	int i = 0;
+	//Hay que buscar un dron equivalente al que nos dieron en el enjambre del sistema.
+	//Por invariante y requiere deberia siempre encontrarlo y ser unico.
+	while (i < enjambreDrones().size()){
+		if (enjambreDrones()[i].id() == d.id()){
+			//Como quiero modificarlo tengo que usar _enjambre, no enjambreDeDrones() no?
+			//Asigno por referencia para poder modificar el drone en cuestion
+			Drone& droneUsado = _enjambre[i];
+		}
+		i++;
+	}
+
+	//El granero cuenta como parcelaDisponible? Falta la aux en la especificacion
+
+	Posicion targetPos;
+	//Estos muchos ifs no me gustan demasiado
+	if (enRangoCultivableLibre(droneUsado.posicionActual().x + 1, droneUsado.posicionActual().y)){
+		targetPos.x = droneUsado.posicionActual().x + 1;
+		targetPos.y = droneUsado.posicionActual().y;
+		droneUsado.moverA(targetPos);
+		droneUsado.setBateria(droneUsado.bateria() - 1);
+	}
+	else if (enRangoCultivableLibre(droneUsado.posicionActual().x - 1, droneUsado.posicionActual().y)){
+		targetPos.x = droneUsado.posicionActual().x - 1;
+		targetPos.y = droneUsado.posicionActual().y;
+		droneUsado.moverA(targetPos);
+		droneUsado.setBateria(droneUsado.bateria() - 1);
+	}
+	else if (enRangoCultivableLibre(droneUsado.posicionActual().x, droneUsado.posicionActual().y + 1)){
+		targetPos.x = droneUsado.posicionActual().x;
+		targetPos.y = droneUsado.posicionActual().y + 1;
+		droneUsado.moverA(targetPos);
+		droneUsado.setBateria(droneUsado.bateria() - 1);
+	}
+	else if (enRangoCultivableLibre(droneUsado.posicionActual().x, droneUsado.posicionActual().y - 1)){
+		targetPos.x = droneUsado.posicionActual().x;
+		targetPos.y = droneUsado.posicionActual().y - 1;
+		droneUsado.moverA(targetPos);
+		droneUsado.setBateria(droneUsado.bateria() - 1);
+	}
+
+	//Si la parcela esta noSensada se le puede poner cualquier verdura (eh, entienden? Cualquier verdura para cultivar!)
+	if (estadoDelCultivo(targetPos) == NoSensado){
+		_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
+	}
+	else {
+		
+	}
+
+
+	/***RECORDAR***/
+	//Cambiar bateria cuando se mueve (drone.moverA() no cambia la bateria)
+	//Cambiar la bateria cuando se aplica un producto o similar
+
+
+
+
 }
 
 void Sistema::mostrar(std::ostream & os) const
