@@ -1,5 +1,7 @@
 #include <iostream>
+#include <fstream>
 #include "campo.h"
+#include "drone.h"
 
 using namespace std;
 
@@ -16,6 +18,20 @@ int main()
 
 	Campo _c = Campo(posG, posC);
 	_c.mostrar(std::cout);
+
+	cout << "\n";
+
+	Drone d;
+
+	/*ifstream droneStr("drone.txt");
+	if (droneStr.is_open()) {
+		d.cargar(droneStr);
+	}*/
+
+	d.mostrar(cout);
+	cout << "\n";
+
+	d.guardar(cout);
 
 	return 0;
 }

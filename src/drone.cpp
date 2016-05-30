@@ -2,6 +2,21 @@
 
 Drone::Drone()
 {
+	_id = 1111;
+	setBateria(99);
+	_enVuelo = true;
+	Posicion pos;
+	pos.x = 1;
+	pos.y = 2;
+	_trayectoria.push_back(pos);
+	pos.y = 3;
+	_trayectoria.push_back(pos);
+	_posicionActual = pos;
+
+	_productos.push_back(Fertilizante);
+	_productos.push_back(Plaguicida);
+	_productos.push_back(PlaguicidaBajoConsumo);
+	_productos.push_back(Fertilizante);
 }
 
 Drone::Drone(ID i, const std::vector<Producto>& ps)
@@ -83,10 +98,75 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 
 void Drone::mostrar(std::ostream & os) const
 {
+	os << "Drone (";
+	if (enVuelo()) {
+		os << "volando";
+	} else {
+		os << "no volando";
+	}
+
+	os << " - " << bateria() << "%)";
+
+	os << " Productos: [";
+	unsigned int n = 0;
+	while (n < productosDisponibles().size()) {
+		mostrarProducto(os, productosDisponibles()[n]);
+		//os << productosDisponibles()[n];
+		n++;
+		if (n < productosDisponibles().size()) {
+			os << ", ";
+		}
+	}
+	os << "]";
+
+	os << " Posicion: " << posicionActual() << " - Trayectoria: [";
+	unsigned int i = 0;
+	while (i < vueloRealizado().size()) {
+		os << vueloRealizado()[n];
+		i++;
+		if (i < vueloRealizado().size()) {
+			os << ", ";
+		}
+	}
+	os << "]\n";
 }
+
+// auxiliar privada que agregamos nosotros
+void Drone::mostrarProducto(std::ostream& os, const Producto producto) const
+{
+	const char *productos[] = {"Fertilizante", "Plaguicida", "PlaguicidaBajoConsumo", "Herbicida", "HerbicidaLargoAlcance"};
+	os << productos[producto];
+}
+
+
 
 void Drone::guardar(std::ostream & os) const
 {
+	os << "{ D " << id() << " " << bateria() << " [";
+	unsigned int n = 0;
+	while (n < vueloRealizado().size()) {
+		os << vueloRealizado()[n];
+		n++;
+		if (n < vueloRealizado().size()) {
+			os << ",";
+		}
+	}
+	os << "] [";
+	unsigned int i = 0;
+	while (i < productosDisponibles().size()) {
+		mostrarProducto(os, productosDisponibles()[i]);
+		i++;
+		if (i < productosDisponibles().size()) {
+			os << ",";
+		}
+	}
+	os << "] ";
+	if (enVuelo()) {
+		os << "true ";
+	} else {
+		os << "false ";
+	}
+	os << posicionActual() << "}";
 }
 
 void Drone::cargar(std::istream & is)
@@ -143,6 +223,7 @@ bool Drone::operator==(const Drone & otroDrone) const
 
 std::ostream & operator<<(std::ostream & os, const Drone & d)
 {
+	d.mostrar(os);
 	return os;
 }
 

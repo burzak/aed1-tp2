@@ -143,7 +143,7 @@ bool Sistema::operator==(const Sistema & otroSistema) const
 
 std::ostream & operator<<(std::ostream & os, const Sistema & s)
 {
-	// TODO: insert return statement here
+	s.mostrar(os);
 	return os;
 }
 
