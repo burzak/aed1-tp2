@@ -184,11 +184,44 @@ void Sistema::volarYSensar(const Drone & d)
 	}
 
 	//Si la parcela esta noSensada se le puede poner cualquier verdura (eh, entienden? Cualquier verdura para cultivar!)
-	if (estadoDelCultivo(targetPos) == NoSensado){
+
+	//Esta variable es por cuestiones meramente esteticas
+	EstadoCultivo estado = estadoDelCultivo(targetPos);
+
+	if (estado == NoSensado){
 		_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
 	}
-	else {
+	else if ((estado == RecienSembrado || estado == EnCrecimiento) &&
+			tieneUnProducto(droneUsado.productosDisponibles(), Fertilizante)) {
 		
+		_estado.parcelas[targetPos.x][targetPos.y] = ListoParaCosechar;
+		droneUsado.sacarProducto(const Producto Fertilizante);
+		//Verificar si fertilizar gasta bateria.
+		//Verificar si queda listo para cosechar cuando esta EnCrecimiento y RecienSembrado
+	}
+	else if (estado == ConPlaga){
+		if (tieneUnProducto(droneUsado.productosDisponibles(), Plaguicida)){
+			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
+			droneUsado.sacarProducto(const Producto Plaguicida);
+			droneUsado.setBateria(droneUsado.bateria() - 10);
+		}
+		else if (tieneUnProducto(droneUsado.productosDisponibles(), PlaguicidaBajoConsumo)){
+			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
+			droneUsado.sacarProducto(const Producto PlaguicidaBajoConsumo);
+			droneUsado.setBateria(droneUsado.bateria() - 5);
+		}
+	}
+	else if (estado == ConMaleza){
+		if (tieneUnProducto(droneUsado.productosDisponibles(), Herbicida)){
+			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
+			droneUsado.sacarProducto(const Producto Herbicida);
+			droneUsado.setBateria(droneUsado.bateria() - 10);
+		}
+		else if (tieneUnProducto(droneUsado.productosDisponibles(), HerbicidaLargoAlcance)){
+			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
+			droneUsado.sacarProducto(const Producto HerbicidaLargoAlcance);
+			droneUsado.setBateria(droneUsado.bateria() - 10);
+		}
 	}
 
 
@@ -243,6 +276,18 @@ bool Sistema::parcelaLibre(int x, int y) const{
 		bool xDistinto = enjambreDrones()[i].posicionActual().x != x;
 		bool yDistinto = enjambreDrones()[i].posicionActual().y != y;
 		res = res && (xDistinto && yDistinto);
+		i++;
+	}
+
+	return res;
+}
+
+static bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar){
+	int i = 0;
+	bool res = false;
+
+	while (i < ps.size()){
+		res = res || ps[i] == productoABuscar;
 		i++;
 	}
 
