@@ -138,21 +138,26 @@ void Sistema::aterrizarYCargarBaterias(Carga b)
 
 void Sistema::fertilizarPorFilas()
 {
+
 }
 
 void Sistema::volarYSensar(const Drone & d)
 {
-	int i = 0;
+	unsigned int i = 0;
+	int indiceDrone;
+	
 	//Hay que buscar un dron equivalente al que nos dieron en el enjambre del sistema.
 	//Por invariante y requiere deberia siempre encontrarlo y ser unico.
 	while (i < enjambreDrones().size()){
 		if (enjambreDrones()[i].id() == d.id()){
 			//Como quiero modificarlo tengo que usar _enjambre, no enjambreDeDrones() no?
 			//Asigno por referencia para poder modificar el drone en cuestion
-			Drone& droneUsado = _enjambre[i];
+			indiceDrone = i;
 		}
 		i++;
 	}
+
+	Drone& droneUsado = _enjambre[indiceDrone];
 
 	//El granero cuenta como parcelaDisponible? Falta la aux en la especificacion
 
@@ -195,31 +200,31 @@ void Sistema::volarYSensar(const Drone & d)
 			tieneUnProducto(droneUsado.productosDisponibles(), Fertilizante)) {
 		
 		_estado.parcelas[targetPos.x][targetPos.y] = ListoParaCosechar;
-		droneUsado.sacarProducto(const Producto Fertilizante);
+		droneUsado.sacarProducto(Fertilizante);
 		//Verificar si fertilizar gasta bateria.
 		//Verificar si queda listo para cosechar cuando esta EnCrecimiento y RecienSembrado
 	}
 	else if (estado == ConPlaga){
 		if (tieneUnProducto(droneUsado.productosDisponibles(), Plaguicida)){
 			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(const Producto Plaguicida);
+			droneUsado.sacarProducto(Plaguicida);
 			droneUsado.setBateria(droneUsado.bateria() - 10);
 		}
 		else if (tieneUnProducto(droneUsado.productosDisponibles(), PlaguicidaBajoConsumo)){
 			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(const Producto PlaguicidaBajoConsumo);
+			droneUsado.sacarProducto(PlaguicidaBajoConsumo);
 			droneUsado.setBateria(droneUsado.bateria() - 5);
 		}
 	}
 	else if (estado == ConMaleza){
 		if (tieneUnProducto(droneUsado.productosDisponibles(), Herbicida)){
 			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(const Producto Herbicida);
+			droneUsado.sacarProducto(Herbicida);
 			droneUsado.setBateria(droneUsado.bateria() - 10);
 		}
 		else if (tieneUnProducto(droneUsado.productosDisponibles(), HerbicidaLargoAlcance)){
 			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(const Producto HerbicidaLargoAlcance);
+			droneUsado.sacarProducto(HerbicidaLargoAlcance);
 			droneUsado.setBateria(droneUsado.bateria() - 10);
 		}
 	}
@@ -282,8 +287,24 @@ bool Sistema::parcelaLibre(int x, int y) const{
 	return res;
 }
 
-static bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar){
-	int i = 0;
+bool Sistema::enRangoCultivableLibre(int x, int y) const{
+	bool res = true;
+	Posicion pos;
+	pos.x = x;
+	pos.y = y;
+
+	res == res && (campo().contenido(pos) == Cultivo);
+
+	unsigned int i = 0;
+	while (i < enjambreDrones().size()){
+		res = res && (enjambreDrones()[i].posicionActual().x != x && enjambreDrones()[i].posicionActual().y != y);
+		i++;
+	}
+	return res;
+}
+
+bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar){
+	unsigned int i = 0;
 	bool res = false;
 
 	while (i < ps.size()){
