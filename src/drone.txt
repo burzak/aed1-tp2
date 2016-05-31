@@ -1,1 +1,1 @@
-{ D 666 66 [[1,2],[1,3]] [Fertilizante,Plaguicida,PlaguicidaBajoConsumo,Fertilizante] false [1,3]}
+{ D 97287 100 [[1,2],[1,3],[243,23],[2,56],[6,6],[666,777]] [Fertilizante,Herbicida,Plaguicida] true [111,33312]}

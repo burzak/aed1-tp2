@@ -1,5 +1,6 @@
 #include "sistema.h"
 #include <algorithm>
+#include <sstream>
 
 Sistema::Sistema()
 {
@@ -254,6 +255,11 @@ void Sistema::guardar(std::ostream & os) const
 
 void Sistema::cargar(std::istream & is)
 {
+  std::string raw;
+
+  // process positions
+  std::stringstream nuevo;
+  nuevo.str(raw.c_str());
 }
 
 bool Sistema::operator==(const Sistema & otroSistema) const

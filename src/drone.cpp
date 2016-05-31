@@ -1,6 +1,6 @@
 #include "drone.h"
 #include "campo.h"
-#include <sstream>
+#include "aux.h"
 
 Drone::Drone()
 {
@@ -108,7 +108,7 @@ void Drone::mostrar(std::ostream & os) const
 	os << " Posicion: " << posicionActual() << " - Trayectoria: [";
 	unsigned int i = 0;
 	while (i < vueloRealizado().size()) {
-		os << vueloRealizado()[n];
+		os << vueloRealizado()[i];
 		i++;
 		if (i < vueloRealizado().size()) {
 			os << ", ";
@@ -152,12 +152,7 @@ void Drone::cargar(std::istream & is)
 {
   std::string raw;
   getline(is, raw);
-  Secuencia<std::string> datos = splitWhiteSpace(raw.substr(1, raw.length()-2));
-  unsigned int n = 0;
-  while (n < datos.size()) {
-    std::cout << n << "-" << datos[n] << std::endl;
-    n++;
-  }
+  Secuencia<std::string> datos = splitBy(raw.substr(1, raw.length()-2), " ");
 
   _id = atoi(datos[1].c_str());
   setBateria(atoi(datos[2].c_str()));
@@ -167,30 +162,11 @@ void Drone::cargar(std::istream & is)
     _enVuelo = false;
   }
 
-  // process positions
-  std::stringstream nuevo;
-  nuevo.str(raw.c_str());
+  // dato[3] tiene [[1,2],[1,3]] y yo quiero sacar los [] que encierran a todos los datos
+  _trayectoria = damePosiciones(datos[3].substr(1, datos[3].length()-2));
+  _posicionActual = damePosiciones(datos[6])[0];
 
-}
-
-Secuencia<Posicion> Drone::damePosiciones(const std::string posiciones) const {
-  return Secuencia<Posicion>();
-}
-
-Secuencia<std::string> Drone::splitWhiteSpace(const std::string cadena) const {
-  Secuencia<std::string> partes;
-  std::string delimiter = " ";
-  int inicio = 0;
-  int indice = 0;
-  while (indice < cadena.length()) {
-    if (cadena.substr(indice, 1) == delimiter && (indice - inicio) > 1) {
-      partes.push_back(cadena.substr(inicio+1, indice - inicio - 1));
-      inicio = indice;
-    }
-    indice++;
-  }
-  partes.push_back(cadena.substr(inicio+1, cadena.length() - inicio));
-  return partes;
+  _productos = dameProductos(datos[4].substr(1, datos[4].length()-2));
 }
 
 void Drone::moverA(const Posicion pos)
