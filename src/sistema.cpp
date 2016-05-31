@@ -137,8 +137,13 @@ void Sistema::aterrizarYCargarBaterias(Carga b)
 }
 
 void Sistema::fertilizarPorFilas()
-{
-
+{/*
+	int i = 0;
+	while (i < campo().dimensiones().largo){
+		int pasos = 0;
+		pasos = pasosIzquierdaPosibles(y);
+		i++;
+	}*/
 }
 
 void Sistema::volarYSensar(const Drone & d)
@@ -314,5 +319,23 @@ bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &pro
 
 	return res;
 }
+
+/*int Sistema::pasosIzquierdaPosibles(int y){
+	Drone d;
+	int i = 0;
+	while (i < enjambreDrones().size()){
+		if (enjambreDrones()[i].posicionActual().y == y){
+			d = enjambreDrones()[i];
+		}
+		i++;
+	}
+	int posX = d.posicionActual().x;
+	i = posX;
+	while (i >= 0){
+
+		i--;
+	}
+}
+*/
 
 //A Galimba no le gusta que usemos  &=  :(
