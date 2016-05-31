@@ -48,7 +48,6 @@ class Drone{
 };
 
 // agregamos nosotros
-inline bool operator==(const Posicion& p1, const Posicion& p2){ return p1.x == p2.x && p1.y == p2.y; };
 inline std::ostream & operator<<(std::ostream & os, const Posicion & p) { return os << "[" << p.x << "," << p.y << "]"; };
 
 // Definirlo usando mostrar, para poder usar << con este tipo.

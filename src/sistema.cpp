@@ -145,7 +145,7 @@ void Sistema::volarYSensar(const Drone & d)
 {
 	unsigned int i = 0;
 	int indiceDrone;
-	
+
 	//Hay que buscar un dron equivalente al que nos dieron en el enjambre del sistema.
 	//Por invariante y requiere deberia siempre encontrarlo y ser unico.
 	while (i < enjambreDrones().size()){
@@ -198,7 +198,7 @@ void Sistema::volarYSensar(const Drone & d)
 	}
 	else if ((estado == RecienSembrado || estado == EnCrecimiento) &&
 			tieneUnProducto(droneUsado.productosDisponibles(), Fertilizante)) {
-		
+
 		_estado.parcelas[targetPos.x][targetPos.y] = ListoParaCosechar;
 		droneUsado.sacarProducto(Fertilizante);
 		//Verificar si fertilizar gasta bateria.
@@ -293,7 +293,7 @@ bool Sistema::enRangoCultivableLibre(int x, int y) const{
 	pos.x = x;
 	pos.y = y;
 
-	res == res && (campo().contenido(pos) == Cultivo);
+	res = res && (campo().contenido(pos) == Cultivo);
 
 	unsigned int i = 0;
 	while (i < enjambreDrones().size()){
