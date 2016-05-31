@@ -1,4 +1,5 @@
 #include "drone.h"
+#include "campo.h"
 
 Drone::Drone()
 {
@@ -98,7 +99,7 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 
 void Drone::mostrar(std::ostream & os) const
 {
-	os << "Drone (";
+	os << "Drone[" << id() <<"] (";
 	if (enVuelo()) {
 		os << "volando";
 	} else {
@@ -110,8 +111,7 @@ void Drone::mostrar(std::ostream & os) const
 	os << " Productos: [";
 	unsigned int n = 0;
 	while (n < productosDisponibles().size()) {
-		mostrarProducto(os, productosDisponibles()[n]);
-		//os << productosDisponibles()[n];
+		os << productosDisponibles()[n];
 		n++;
 		if (n < productosDisponibles().size()) {
 			os << ", ";
@@ -131,13 +131,6 @@ void Drone::mostrar(std::ostream & os) const
 	os << "]\n";
 }
 
-// auxiliar privada que agregamos nosotros
-void Drone::mostrarProducto(std::ostream& os, const Producto producto) const
-{
-	const char *productos[] = {"Fertilizante", "Plaguicida", "PlaguicidaBajoConsumo", "Herbicida", "HerbicidaLargoAlcance"};
-	os << productos[producto];
-}
-
 
 
 void Drone::guardar(std::ostream & os) const
@@ -154,7 +147,7 @@ void Drone::guardar(std::ostream & os) const
 	os << "] [";
 	unsigned int i = 0;
 	while (i < productosDisponibles().size()) {
-		mostrarProducto(os, productosDisponibles()[i]);
+		os << productosDisponibles()[i];
 		i++;
 		if (i < productosDisponibles().size()) {
 			os << ",";
@@ -171,6 +164,38 @@ void Drone::guardar(std::ostream & os) const
 
 void Drone::cargar(std::istream & is)
 {
+  std::string raw;
+  getline(is, raw);
+  Secuencia<std::string> datos = splitWhiteSpace(raw.substr(1, raw.length()-2));
+  unsigned int n = 0;
+  while (n < datos.size()) {
+    std::cout << n << "-" << datos[n] << std::endl;
+    n++;
+  }
+
+  _id = atoi(datos[1].c_str());
+  setBateria(atoi(datos[2].c_str()));
+  if (datos[5].compare("true") == 0) {
+    _enVuelo = true;
+  } else {
+    _enVuelo = false;
+  }
+}
+
+Secuencia<std::string> Drone::splitWhiteSpace(const std::string cadena) const {
+  Secuencia<std::string> partes;
+  std::string delimiter = " ";
+  int inicio = 0;
+  int indice = 0;
+  while (indice < cadena.length()) {
+    if (cadena.substr(indice, 1) == delimiter && (indice - inicio) > 1) {
+      partes.push_back(cadena.substr(inicio+1, indice - inicio - 1));
+      inicio = indice;
+    }
+    indice++;
+  }
+  partes.push_back(cadena.substr(inicio+1, cadena.length() - inicio));
+  return partes;
 }
 
 void Drone::moverA(const Posicion pos)

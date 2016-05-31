@@ -23,15 +23,16 @@ int main()
 
 	Drone d;
 
-	/*ifstream droneStr("drone.txt");
+	ifstream droneStr("drone.txt");
 	if (droneStr.is_open()) {
 		d.cargar(droneStr);
-	}*/
+    cout << d;
+	} else {
+    d.mostrar(cout);
+    cout << "\n";
 
-	d.mostrar(cout);
-	cout << "\n";
-
-	d.guardar(cout);
+    d.guardar(cout);
+  }
 
 	return 0;
 }

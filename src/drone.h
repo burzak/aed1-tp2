@@ -43,7 +43,7 @@ class Drone{
         static int cantidad(const Secuencia<Producto> lista, Producto producto);
         static int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud);
         static bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2);
-        void mostrarProducto(std::ostream& os, const Producto producto) const;
+        Secuencia<std::string> splitWhiteSpace(const std::string cadena) const;
 };
 
 // agregamos nosotros
