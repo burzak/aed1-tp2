@@ -1,3 +1,9 @@
 *.o
 src/main
 *.o
+.*
+build/
+src/mail.dSYM/
+src/main.dSYM/
+src/.DS_Store
+src/.DS_Store
