@@ -220,12 +220,12 @@ void Sistema::volarYSensar(const Drone & d)
 		if (tieneUnProducto(droneUsado.productosDisponibles(), Herbicida)){
 			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
 			droneUsado.sacarProducto(Herbicida);
-			droneUsado.setBateria(droneUsado.bateria() - 10);
+			droneUsado.setBateria(droneUsado.bateria() - 5);
 		}
 		else if (tieneUnProducto(droneUsado.productosDisponibles(), HerbicidaLargoAlcance)){
 			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
 			droneUsado.sacarProducto(HerbicidaLargoAlcance);
-			droneUsado.setBateria(droneUsado.bateria() - 10);
+			droneUsado.setBateria(droneUsado.bateria() - 5);
 		}
 	}
 
@@ -314,3 +314,5 @@ bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &pro
 
 	return res;
 }
+
+//A Galimba no le gusta que usemos  &=  :(
