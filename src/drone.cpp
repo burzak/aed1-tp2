@@ -1,23 +1,9 @@
 #include "drone.h"
 #include "campo.h"
+#include <sstream>
 
 Drone::Drone()
 {
-	_id = 1111;
-	setBateria(99);
-	_enVuelo = true;
-	Posicion pos;
-	pos.x = 1;
-	pos.y = 2;
-	_trayectoria.push_back(pos);
-	pos.y = 3;
-	_trayectoria.push_back(pos);
-	_posicionActual = pos;
-
-	_productos.push_back(Fertilizante);
-	_productos.push_back(Plaguicida);
-	_productos.push_back(PlaguicidaBajoConsumo);
-	_productos.push_back(Fertilizante);
 }
 
 Drone::Drone(ID i, const std::vector<Producto>& ps)
@@ -180,6 +166,15 @@ void Drone::cargar(std::istream & is)
   } else {
     _enVuelo = false;
   }
+
+  // process positions
+  std::stringstream nuevo;
+  nuevo.str(raw.c_str());
+
+}
+
+Secuencia<Posicion> Drone::damePosiciones(const std::string posiciones) const {
+  return Secuencia<Posicion>();
 }
 
 Secuencia<std::string> Drone::splitWhiteSpace(const std::string cadena) const {
