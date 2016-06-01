@@ -56,6 +56,11 @@ class Sistema {
         bool parcelaLibre(int x, int y) const;
         static Posicion vecinoAlOeste(const Posicion &p);
 
+        //nuestras
+        int pasosIzquierdaPosibles(int y);
+        int mayor(int a, int b);
+        int menor(int a, int b);
+
         static bool tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar);
         // soluci�n --> deber�amos agregarla como funciones globales en tipos.h
         void split(const std::string &s, char delim, std::vector<std::string> &elems);

@@ -76,10 +76,11 @@ void Sistema::seVinoLaMaleza(const Secuencia<Posicion>& ps)
 
 void Sistema::seExpandePlaga()
 {
+	//Probablemente haya que arreglar porque estoy expandiendo la plaga al mismo tiempo que chequeo
 	int i = 0;
-	while (i < _campo.dimensiones().ancho){
+	while (i < campo().dimensiones().ancho){
 		int j = 0;
-		while (j < _campo.dimensiones().largo){
+		while (j < campo().dimensiones().largo){
 			//Es necesario verificar que las parcelas vecinas existan.
 			if(enRangoConPlaga(i+1,j)||enRangoConPlaga(i-1,j)||enRangoConPlaga(i,j+1)||enRangoConPlaga(i,j-1)){
 				_estado.parcelas[i][j] = ConPlaga;
@@ -295,9 +296,18 @@ std::ostream & operator<<(std::ostream & os, const Sistema & s)
 /********************** AUX *****************************/
 bool Sistema::enRangoConPlaga(int x, int y) const{
 	bool res = true;
-	res = res && (x >= 0) && (x < _campo.dimensiones().ancho);
-	res = res && (y >= 0) && (y < _campo.dimensiones().largo);
-	res = res && _estado.parcelas[x][y] == ConPlaga;
+	Posicion pos;
+	pos.x = x;
+	pos.y = y;
+
+	if(enRango(x,y)){
+		if(campo().contenido(pos) == Cultivo){
+			res = res && _estado.parcelas[x][y] == ConPlaga;
+		}
+		else{
+			res = false;
+		}
+	}
 	return res;
 }
 
@@ -352,8 +362,9 @@ bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &pro
 	return res;
 }
 
-/*int Sistema::pasosIzquierdaPosibles(int y){
+int Sistema::pasosIzquierdaPosibles(int y){
 	Drone d;
+	
 	int i = 0;
 	while (i < enjambreDrones().size()){
 		if (enjambreDrones()[i].posicionActual().y == y){
@@ -361,13 +372,79 @@ bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &pro
 		}
 		i++;
 	}
+	
 	int posX = d.posicionActual().x;
+	
 	i = posX;
+	//Los inicializo en -1 para que en caso que no haya ni G ni C en la fila se pueda usar como limite
+	int xGranero = -1;
+	int xCasa = -1;
 	while (i >= 0){
-
+		Posicion pos;
+		pos.x = i;
+		pos.y = y;
+		if(campo().contenido(pos) == Casa){
+			xCasa = i;
+		}
+		if(campo().contenido(pos) == Granero){
+			xGranero = i;
+		}
 		i--;
 	}
+
+	int fertilizante = 0;
+	i = 0;
+	while(i < d.productosDisponibles().size()){
+		if(d.productosDisponibles()[i] == Fertilizante){
+			fertilizante++;
+		}
+		i++;
+	}
+
+	i = posX;
+	int pasosFert = 0;
+	while(i > mayor(xCasa, xGranero)){
+		Posicion pos;
+		pos.x = i;
+		pos.y = y;
+		if((estadoDelCultivo(pos) != EnCrecimiento && estadoDelCultivo(pos) != RecienSembrado) &&
+			fertilizante > 0){
+			pasosFert++;
+		}
+		if((estadoDelCultivo(pos) == EnCrecimiento || estadoDelCultivo(pos) == RecienSembrado) &&
+			fertilizante > 0){
+			pasosFert++;
+			fertilizante--;
+		}
+		i--;
+	}
+
+	return menor(pasosFert, menor(d.bateria(), menor(posX - xGranero, posX - xCasa)));
+
+
 }
-*/
+
+int Sistema::mayor(int a, int b){
+	int res;
+	if(a > b){
+		res = a;
+	}
+	else {
+		res = b;
+	}
+	return res;
+}
+
+int Sistema::menor(int a, int b){
+		int res;
+	if(a < b){
+		res = a;
+	}
+	else {
+		res = b;
+	}
+	return res;
+}
+
 
 //A Galimba no le gusta que usemos  &=  :(
