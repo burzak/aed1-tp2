@@ -48,11 +48,17 @@ void Sistema::crecer()
 	while(i < _campo.dimensiones().ancho){
 			int j = 0;
 			while (j < _campo.dimensiones().largo) {
-				if (_estado.parcelas[i][j] == RecienSembrado){
+				Posicion pos;
+				pos.x = i;
+				pos.y = j;
+				if (estadoDelCultivo(pos) == RecienSembrado){
 					_estado.parcelas[i][j] = EnCrecimiento;
 				}
-				if (_estado.parcelas[i][j] == EnCrecimiento){
+				else if (estadoDelCultivo(pos) == EnCrecimiento){
 					_estado.parcelas[i][j] = ListoParaCosechar;
+				}
+				else{
+					_estado.parcelas[i][j] = _estado.parcelas[i][j];
 				}
 				j++;
 			}
@@ -89,21 +95,25 @@ void Sistema::despegar(const Drone & d)
 {
 	Posicion pos;
 
-	if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y)){
-		pos.x = d.posicionActual().x + 1;
-		pos.y = d.posicionActual().y;
-	}
-	if (parcelaLibre(d.posicionActual().x - 1, d.posicionActual().y)){
+	if (parcelaLibre(d.posicionActual().x - 1, d.posicionActual().y) &&
+			enRango(d.posicionActual().x - 1, d.posicionActual().y)){
 		pos.x = d.posicionActual().x - 1;
 		pos.y = d.posicionActual().y;
 	}
-	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1)){
+	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1) &&
+			enRango(d.posicionActual().x, d.posicionActual().y + 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y + 1;
 	}
-	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1)){
+	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1) &&
+			enRango(d.posicionActual().x, d.posicionActual().y - 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y - 1;
+	}
+	if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y) &&
+			enRango(d.posicionActual().x + 1, d.posicionActual().y)){
+		pos.x = d.posicionActual().x + 1;
+		pos.y = d.posicionActual().y;
 	}
 
 	unsigned int i = 0;
@@ -118,21 +128,27 @@ void Sistema::despegar(const Drone & d)
 bool Sistema::listoParaCosechar() const
 {
 	int i = 0;
-	float parcelasListas = 0;
-	float cantidadParcelas = 0;
+	int parcelasListas = 0;
+	//int cantidadParcelas = 0;
 
+	//En vez de contar cantidadParcelas podemos hacer ancho * largo
 	while (i < campo().dimensiones().ancho){
 		int j = 0;
 		while (j < campo().dimensiones().largo){
-			if (_estado.parcelas[i][j] == ListoParaCosechar){
+			Posicion pos;
+			pos.x = i;
+			pos.y = j;
+			//if (_estado.parcelas[i][j] == ListoParaCosechar){
+			if (estadoDelCultivo(pos) == ListoParaCosechar){
 				parcelasListas++;
 			}
-			cantidadParcelas++;
+			//cantidadParcelas++;
 			j++;
 		}
 		i++;
 	}
-	return (parcelasListas/parcelasListas) >= 0.9;
+	//return (parcelasListas/cantidadParcelas) > 0.9;
+	return ((parcelasListas/(campo().dimensiones().ancho * campo().dimensiones().largo)) >= 0.9);
 }
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
@@ -150,7 +166,7 @@ void Sistema::fertilizarPorFilas()
 }
 
 void Sistema::volarYSensar(const Drone & d)
-{/*
+{
 	unsigned int i = 0;
 	int indiceDrone;
 
@@ -235,7 +251,7 @@ void Sistema::volarYSensar(const Drone & d)
 			droneUsado.sacarProducto(HerbicidaLargoAlcance);
 			droneUsado.setBateria(droneUsado.bateria() - 5);
 		}
-	}*/
+	}
 
 
 	/***RECORDAR***/
@@ -283,6 +299,15 @@ bool Sistema::enRangoConPlaga(int x, int y) const{
 	res = res && (x >= 0) && (x < _campo.dimensiones().ancho);
 	res = res && (y >= 0) && (y < _campo.dimensiones().largo);
 	res = res && _estado.parcelas[x][y] == ConPlaga;
+	return res;
+}
+
+bool Sistema::enRango(int x, int y) const{
+	bool res;
+	bool xValida = (x >= 0 && x < campo().dimensiones().ancho);
+	bool yValida = (y >= 0 && y < campo().dimensiones().largo);
+	res = xValida && yValida;
+
 	return res;
 }
 

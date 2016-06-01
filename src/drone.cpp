@@ -84,6 +84,7 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 		}
 		n++;
 	}
+	//hay que sacar repetidos y todo eso
 	return vuelosCruzados;
 }
 
