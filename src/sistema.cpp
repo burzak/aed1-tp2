@@ -229,77 +229,51 @@ void Sistema::volarYSensar(const Drone & d)
 		i++;
 	}
 
-	Drone& droneUsado = _enjambre[indiceDrone];
+	Drone& drone = _enjambre[indiceDrone];
+	int posX = drone.posicionActual().x;
+	int posY = drone.posicionActual().y;
+	bool seMovio = false;
 
 	//El granero cuenta como parcelaDisponible? Falta la aux en la especificacion
 
 	Posicion targetPos;
 	//Estos muchos ifs no me gustan demasiado
-	if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x + 1, droneUsado.posicionActual().y)){
-		targetPos.x = droneUsado.posicionActual().x + 1;
-		targetPos.y = droneUsado.posicionActual().y;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	if (drone.bateria() >0 && enRangoCultivableLibre(posX + 1, posY)){
+		targetPos.x = posX + 1;
+		targetPos.y = posY;
+		drone.moverA(targetPos);
+		drone.setBateria(drone.bateria() - 1);
+		seMovio = true;
 	}
-	else if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x - 1, droneUsado.posicionActual().y)){
-		targetPos.x = droneUsado.posicionActual().x - 1;
-		targetPos.y = droneUsado.posicionActual().y;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	else if (drone.bateria() >0 && enRangoCultivableLibre(posX - 1, posY)){
+		targetPos.x = posX - 1;
+		targetPos.y = posY;
+		drone.moverA(targetPos);
+		drone.setBateria(drone.bateria() - 1);
+		seMovio = true;
 	}
-	else if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x, droneUsado.posicionActual().y + 1)){
-		targetPos.x = droneUsado.posicionActual().x;
-		targetPos.y = droneUsado.posicionActual().y + 1;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	else if (drone.bateria() >0 && enRangoCultivableLibre(posX, posY + 1)){
+		targetPos.x = posX;
+		targetPos.y = posY + 1;
+		drone.moverA(targetPos);
+		drone.setBateria(drone.bateria() - 1);
+		seMovio = true;
 	}
-	else if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x, droneUsado.posicionActual().y - 1)){
-		targetPos.x = droneUsado.posicionActual().x;
-		targetPos.y = droneUsado.posicionActual().y - 1;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	else if (drone.bateria() >0 && enRangoCultivableLibre(posX, posY - 1)){
+		targetPos.x = posX;
+		targetPos.y = posY - 1;
+		drone.moverA(targetPos);
+		drone.setBateria(d.bateria() - 1);
+		seMovio = true;
 	}
 
 	//Si la parcela esta noSensada se le puede poner cualquier verdura (eh, entienden? Cualquier verdura para cultivar!)
 
-	//Esta variable es por cuestiones meramente esteticas
-	EstadoCultivo estado = estadoDelCultivo(targetPos);
-
-	if (estado == NoSensado){
-		_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
+	if(seMovio == true){
+		modificarCultivoYDrone(targetPos, drone);
 	}
-	else if ((estado == RecienSembrado || estado == EnCrecimiento) &&
-			tieneUnProducto(droneUsado.productosDisponibles(), Fertilizante)) {
-
-		_estado.parcelas[targetPos.x][targetPos.y] = ListoParaCosechar;
-		droneUsado.sacarProducto(Fertilizante);
-		//Verificar si fertilizar gasta bateria.
-		//Verificar si queda listo para cosechar cuando esta EnCrecimiento y RecienSembrado
-	}
-	else if (estado == ConPlaga){
-		if (droneUsado.bateria() >=10 && tieneUnProducto(droneUsado.productosDisponibles(), Plaguicida)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(Plaguicida);
-			droneUsado.setBateria(droneUsado.bateria() - 10);
-		}
-		else if (droneUsado.bateria() >=5 && tieneUnProducto(droneUsado.productosDisponibles(), PlaguicidaBajoConsumo)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(PlaguicidaBajoConsumo);
-			droneUsado.setBateria(droneUsado.bateria() - 5);
-		}
-	}
-	else if (estado == ConMaleza){
-		if (droneUsado.bateria() >=5 && tieneUnProducto(droneUsado.productosDisponibles(), Herbicida)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(Herbicida);
-			droneUsado.setBateria(droneUsado.bateria() - 5);
-		}
-		else if (droneUsado.bateria() >=5 && tieneUnProducto(droneUsado.productosDisponibles(), HerbicidaLargoAlcance)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(HerbicidaLargoAlcance);
-			droneUsado.setBateria(droneUsado.bateria() - 5);
-		}
-	}
+	
+}
 
 
 	/***RECORDAR***/
@@ -307,9 +281,6 @@ void Sistema::volarYSensar(const Drone & d)
 	//Cambiar la bateria cuando se aplica un producto o similar
 
 
-
-
-}
 
 void Sistema::mostrar(std::ostream & os) const
 {
@@ -492,6 +463,46 @@ int Sistema::menor(int a, int b){
 		res = b;
 	}
 	return res;
+}
+
+void Sistema::modificarCultivoYDrone(Posicion pos, Drone &d){
+	EstadoCultivo estado = estadoDelCultivo(pos);
+
+	if (estado == NoSensado){
+		_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+	}
+	else if ((estado == RecienSembrado || estado == EnCrecimiento) &&
+				tieneUnProducto(d.productosDisponibles(), Fertilizante)) {
+
+		_estado.parcelas[pos.x][pos.y] = ListoParaCosechar;
+		d.sacarProducto(Fertilizante);
+		//Verificar si fertilizar gasta bateria.
+		//Verificar si queda listo para cosechar cuando esta EnCrecimiento y RecienSembrado
+	}
+	else if (estado == ConPlaga){
+		if (d.bateria() >=10 && tieneUnProducto(d.productosDisponibles(), Plaguicida)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(Plaguicida);
+			d.setBateria(d.bateria() - 10);
+		}
+		else if (d.bateria() >=5 && tieneUnProducto(d.productosDisponibles(), PlaguicidaBajoConsumo)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(PlaguicidaBajoConsumo);
+			d.setBateria(d.bateria() - 5);
+		}
+	}
+	else if (estado == ConMaleza){
+		if (d.bateria() >=5 && tieneUnProducto(d.productosDisponibles(), Herbicida)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(Herbicida);
+			d.setBateria(d.bateria() - 5);
+		}
+		else if (d.bateria() >=5 && tieneUnProducto(d.productosDisponibles(), HerbicidaLargoAlcance)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(HerbicidaLargoAlcance);
+			d.setBateria(d.bateria() - 5);
+		}
+	}
 }
 
 

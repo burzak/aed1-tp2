@@ -60,6 +60,7 @@ class Sistema {
         int pasosIzquierdaPosibles(int y);
         int mayor(int a, int b);
         int menor(int a, int b);
+        void modificarCultivoYDrone(Posicion pos, Drone &d);
 
         static bool tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar);
         // soluci�n --> deber�amos agregarla como funciones globales en tipos.h
