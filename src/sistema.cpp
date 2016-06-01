@@ -46,22 +46,21 @@ void Sistema::crecer()
 {
 	int i = 0;
 	while(i < _campo.dimensiones().ancho){
-			int j = 0;
-			while (j < _campo.dimensiones().largo) {
-				Posicion pos;
-				pos.x = i;
-				pos.y = j;
+		int j = 0;
+		while (j < _campo.dimensiones().largo) {
+			Posicion pos;
+			pos.x = i;
+			pos.y = j;
+			if (campo().contenido(pos) == Cultivo){
 				if (estadoDelCultivo(pos) == RecienSembrado){
 					_estado.parcelas[i][j] = EnCrecimiento;
 				}
 				else if (estadoDelCultivo(pos) == EnCrecimiento){
 					_estado.parcelas[i][j] = ListoParaCosechar;
 				}
-				else{
-					_estado.parcelas[i][j] = _estado.parcelas[i][j];
-				}
-				j++;
 			}
+			j++;
+		}
 		i++;
 	}
 }
@@ -83,7 +82,7 @@ void Sistema::seExpandePlaga()
 		while (j < _campo.dimensiones().largo){
 			//Es necesario verificar que las parcelas vecinas existan.
 			if(enRangoConPlaga(i+1,j)||enRangoConPlaga(i-1,j)||enRangoConPlaga(i,j+1)||enRangoConPlaga(i,j-1)){
-				_estado.parcelas[i][j] = ConMaleza;
+				_estado.parcelas[i][j] = ConPlaga;
 			}
 			j++;
 		}
