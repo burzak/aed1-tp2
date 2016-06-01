@@ -21,6 +21,13 @@ Campo::Campo(const Posicion &posG, const Posicion &posC)
 
 }
 
+Campo::Campo(const Posicion &posG, const Posicion &posC, Dimension dimension) {
+    _dimension = dimension;
+    _grilla = Grilla<Parcela>(_dimension);
+    _grilla.parcelas[posG.x][posG.y] = Granero;
+    _grilla.parcelas[posC.x][posC.y] = Casa;
+}
+
 Dimension Campo::dimensiones() const
 {
 	return _dimension;

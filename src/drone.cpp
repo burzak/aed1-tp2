@@ -12,6 +12,10 @@ Drone::Drone(ID i, const std::vector<Producto>& ps)
 	setBateria(100);
 	_enVuelo = false;
 	_productos = ps;
+	Posicion p;
+	p.x = 0;
+	p.y = 0;
+	_posicionActual = p;
 }
 
 ID Drone::id() const
@@ -80,7 +84,7 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 		}
 		n++;
 	}
-	return Secuencia<InfoVueloCruzado>();
+	return vuelosCruzados;
 }
 
 void Drone::mostrar(std::ostream & os) const
@@ -150,7 +154,7 @@ void Drone::guardar(std::ostream & os) const
 
 void Drone::cargar(std::istream & is)
 {
-  std::string raw;
+	std::string raw;
   getline(is, raw);
   Secuencia<std::string> datos = splitBy(raw.substr(1, raw.length()-2), " ");
 
@@ -201,6 +205,7 @@ void Drone::sacarProducto(const Producto p)
 		if (_productos[n] == p) {
 			indiceProducto = n;
 		}
+		n++;
 	}
 	_productos.erase(_productos.begin() + indiceProducto);
 }
@@ -211,7 +216,12 @@ bool Drone::operator==(const Drone & otroDrone) const
 	res = res && id() == otroDrone.id();
 	res = res && bateria() == otroDrone.bateria();
 	res = res && enVuelo() == otroDrone.enVuelo();
-	res = res && vueloRealizado() == otroDrone.vueloRealizado();
+	unsigned int n = 0;
+	while (n < vueloRealizado().size()) {
+		res = res && vueloRealizado()[n] == otroDrone.vueloRealizado()[n];
+		n++;
+	}
+	res = res && vueloRealizado().size() == otroDrone.vueloRealizado().size();
 	res = res && posicionActual() == otroDrone.posicionActual();
 	res = res && mismosProductos(productosDisponibles(), otroDrone.productosDisponibles());
 	return res;
@@ -258,6 +268,7 @@ int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud
 			if (ds[j].vueloRealizado()[n] == pos) {
 				cant++;
 			}
+			j++;
 		}
 		if (cant > 1) {
 			total = total + cant;

@@ -12,14 +12,16 @@ Sistema::Sistema(const Campo & c, const Secuencia<Drone>& ds)
 	Dimension dim = _campo.dimensiones();
 
 	// revisar/preguntar porque no podemos pasarle las dimensiones a Grilla
-	_estado = Grilla<EstadoCultivo>();
+	_estado = Grilla<EstadoCultivo>(dim);
 
 	int i = 0;
 	while (i < dim.ancho) {
 		int j = 0;
 		while (j < dim.largo) {
 			_estado.parcelas[i][j] = NoSensado;
+			j++;
 		}
+		i++;
 	}
 
 	_enjambre = ds;
@@ -148,7 +150,7 @@ void Sistema::fertilizarPorFilas()
 }
 
 void Sistema::volarYSensar(const Drone & d)
-{
+{/*
 	unsigned int i = 0;
 	int indiceDrone;
 
@@ -233,7 +235,7 @@ void Sistema::volarYSensar(const Drone & d)
 			droneUsado.sacarProducto(HerbicidaLargoAlcance);
 			droneUsado.setBateria(droneUsado.bateria() - 5);
 		}
-	}
+	}*/
 
 
 	/***RECORDAR***/
