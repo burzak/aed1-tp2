@@ -156,13 +156,61 @@ void Sistema::aterrizarYCargarBaterias(Carga b)
 }
 
 void Sistema::fertilizarPorFilas()
-{/*
-	int i = 0;
+{
+	unsigned int i = 0;
 	while (i < campo().dimensiones().largo){
-		int pasos = 0;
-		pasos = pasosIzquierdaPosibles(y);
+		unsigned int pasos = 0;
+		pasos = pasosIzquierdaPosibles(i);
+		
+		
+		//Busco el drone para modificarlo
+		int indiceDrone;
+		unsigned int j = 0;
+		while (j < _enjambre.size()){
+			if(_enjambre[j].posicionActual().y == i){
+				indiceDrone = j;
+			}
+			j++;
+		}
+
+		int posXIni = _enjambre[indiceDrone].posicionActual().x;
+
+		//Fertilizo las parcelas por las que paso y veo cuanto fertilizante hay que sacar.
+		int fertUsado = 0;
+		j = 0;
+		while(j < pasos){
+			Posicion pos;
+			pos.y = i;
+			pos.x = posXIni - j;
+			if(campo().contenido(pos) == Cultivo){
+				if(estadoDelCultivo(pos) == EnCrecimiento || estadoDelCultivo(pos) == RecienSembrado){
+					fertUsado++;
+					_estado.parcelas[posXIni - j][i] = ListoParaCosechar;
+				}
+			}
+			j++;
+		}
+
+
+		j = 0;
+		while(j <= fertUsado){
+			_enjambre[indiceDrone].sacarProducto(Fertilizante);
+			j++;
+		}
+
+		_enjambre[indiceDrone].setBateria(_enjambre[indiceDrone].bateria() - pasos);
+
+		j = 0;
+		while(j <= posXIni){
+			Posicion pos;
+			pos.x = posXIni - j;
+			pos.y = i;
+			_enjambre[indiceDrone].moverA(pos);
+			j++;
+		}
+
 		i++;
-	}*/
+	}
 }
 
 void Sistema::volarYSensar(const Drone & d)
