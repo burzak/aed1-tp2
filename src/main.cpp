@@ -17,10 +17,27 @@ int main()
 	posC.x = 3;
 	posC.y = 3;
 
-	Campo _c = Campo(posG, posC);
-	_c.mostrar(std::cout);
+	Campo _c;
+
+  Secuencia<string> lista = cargarLista("[Cultivo,Cultivo,Cultivo,Cultivo]", "[", "]");
+  imprimirLista(lista);
+
+  lista = cargarLista("[[Cultivo,Cultivo,Cultivo,Cultivo],[Cultivo,Cultivo,Cultivo,Cultivo],[Cultivo,Cultivo,Granero,Cultivo],[Cultivo,Cultivo,Cultivo,Casa]]", "[", "]");
+  imprimirLista(lista);
+
+  /*
+  ifstream campoStr("campo.txt");
+  if (campoStr.is_open()) {
+    _c.cargar(campoStr);
+    _c.guardar(cout);
+  } else {
+    _c.mostrar(cout);
+    cout << "\n";
+    _c.guardar(cout);
+  }*/
 
 
+/*
 	Drone d;
 
 	ifstream droneStr("drone.txt");
@@ -32,7 +49,7 @@ int main()
     cout << "\n";
 
     d.guardar(cout);
-  }
+  }*/
 
 	return 0;
 }

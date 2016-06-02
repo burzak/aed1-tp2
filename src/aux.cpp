@@ -4,14 +4,23 @@
 using namespace std;
 
 
-Secuencia<std::string> splitBy(const std::string cadena, const std::string delimiter) {
-  Secuencia<std::string> partes;
+void imprimirLista(const Secuencia<string> secuencia) {
+  unsigned int n = 0;
+  cout << endl << "Lista:" << endl;
+  while (n < secuencia.size()) {
+    cout << "-" << secuencia[n] << "-" << endl;
+    n++;
+  }
+}
+
+Secuencia<string> splitBy(const string cadena, const string delimiter) {
+  Secuencia<string> partes;
   int inicio = 0;
   int indice = 0;
   int cantidadLetras = 1;
   while (indice < cadena.length()) {
     if (cadena.compare(indice, delimiter.length(), delimiter) == 0) {
-      std::string aux = cadena.substr(inicio, cantidadLetras);
+      string aux = cadena.substr(inicio, cantidadLetras);
       aux = sacarDelimitadorInicioFinal(aux, delimiter);
       if (aux.length() > 0) {
         partes.push_back(aux);
@@ -26,7 +35,7 @@ Secuencia<std::string> splitBy(const std::string cadena, const std::string delim
   return partes;
 }
 
-std::string sacarDelimitadorInicioFinal(const std::string cadena, const std::string delimiter) {
+string sacarDelimitadorInicioFinal(const string cadena, const string delimiter) {
   if (cadena.length() < delimiter.length()) {
     return cadena.substr(0, cadena.length());
   }
@@ -43,8 +52,8 @@ std::string sacarDelimitadorInicioFinal(const std::string cadena, const std::str
 }
 
 
-Secuencia<Posicion> damePosiciones(const std::string posicionesStr) {
-  Secuencia<std::string> coordenadas;
+Secuencia<Posicion> damePosiciones(const string posicionesStr) {
+  Secuencia<string> coordenadas;
   Secuencia<Posicion> posiciones;
   coordenadas = splitBy(posicionesStr, ",");
   unsigned int n = 0;
@@ -64,7 +73,7 @@ Secuencia<Posicion> damePosiciones(const std::string posicionesStr) {
   return posiciones;
 }
 
-Secuencia<Producto> dameProductos(const std::string productosStr) {
+Secuencia<Producto> dameProductos(const string productosStr) {
   const char *listaProductos[] = {"Fertilizante", "Plaguicida", "PlaguicidaBajoConsumo", "Herbicida", "HerbicidaLargoAlcance"};
   Secuencia<Producto> productos;
 	Secuencia<string> productosStrings = splitBy(productosStr, ",");
@@ -80,4 +89,55 @@ Secuencia<Producto> dameProductos(const std::string productosStr) {
     n++;
   }
   return productos;
+}
+
+Secuencia<string> cargarLista(const string listaStr, const string caracterComienzo, const string caracterFin) {
+  Secuencia<string> lista;
+  unsigned int inicio = 0;
+  unsigned int index = 0;
+  unsigned int cantidad = 0;
+  unsigned int contador = 0;
+  while (index < listaStr.length()) {
+    string actual = listaStr.substr(index, 1);
+    cout << actual;
+    if (actual.compare(",") == 0 && contador == 1) {
+      lista.push_back(listaStr.substr(inicio, cantidad));
+      cantidad = 0;
+      inicio = index + 1;
+    } else if (actual.compare(caracterComienzo) == 0 && contador == 0) {
+      contador++;
+      inicio++;
+    } else if (actual.compare(caracterComienzo) == 0) {
+      contador++;
+      cantidad++;
+    } else if (actual.compare(caracterFin) == 0 && contador == 1) {
+      contador--;
+      lista.push_back(listaStr.substr(inicio, cantidad));
+    } else if (actual.compare(caracterFin) == 0) {
+      contador--;
+      cantidad++;
+    } else {
+      cantidad++;
+    }
+    index++;
+  }
+  return lista;
+}
+
+Grilla<Parcela> crearGrilla(Dimension dimension) {
+  Grilla<Parcela> grilla = Grilla<Parcela>(dimension);
+  int x = 0;
+  while (x < dimension.ancho) {
+    int y = 0;
+    while (y < dimension.largo) {
+      grilla.parcelas[x][y] = Cultivo;
+      y++;
+    }
+    x++;
+  }
+  return grilla;
+}
+
+ostream &operator<<(ostream &os, const Dimension &d) {
+  return os << "[" << d.ancho << "," << d.largo << "]";
 }
