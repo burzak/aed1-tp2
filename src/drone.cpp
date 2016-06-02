@@ -178,7 +178,11 @@ void Drone::moverA(const Posicion pos)
 {
 	_enVuelo = true;
 	_trayectoria.push_back(pos);
-	cambiarPosicionActual(pos); // por invariante agregamos esta linea
+	_posicionActual.x = pos.x;
+	_posicionActual.y = pos.y;
+	
+
+	//cambiarPosicionActual(pos); // por invariante agregamos esta linea
 	// debemos verificar invariante movimientoOK? pos tiene que ser un movimiento valido?
 }
 
@@ -195,7 +199,8 @@ void Drone::borrarVueloRealizado()
 
 void Drone::cambiarPosicionActual(const Posicion p)
 {
-	_posicionActual = p;
+	_posicionActual.x = p.x;
+	_posicionActual.y = p.y;
 }
 
 void Drone::sacarProducto(const Producto p)

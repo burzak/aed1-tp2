@@ -1,6 +1,7 @@
 #include "sistema.h"
 #include <algorithm>
 #include <sstream>
+#include <ostream>
 
 Sistema::Sistema()
 {
@@ -18,7 +19,7 @@ Sistema::Sistema(const Campo & c, const Secuencia<Drone>& ds)
 	while (i < dim.ancho) {
 		int j = 0;
 		while (j < dim.largo) {
-			_estado.parcelas[i][j] = NoSensado;
+			_estado.parcelas[i][j] = RecienSembrado;
 			j++;
 		}
 		i++;
@@ -34,7 +35,7 @@ const Campo & Sistema::campo() const
 
 EstadoCultivo Sistema::estadoDelCultivo(const Posicion & p) const
 {
-	return EstadoCultivo();
+	return _estado.parcelas[p.x][p.y];
 }
 
 const Secuencia<Drone>& Sistema::enjambreDrones() const
@@ -78,11 +79,13 @@ void Sistema::seExpandePlaga()
 {
 	//Probablemente haya que arreglar porque estoy expandiendo la plaga al mismo tiempo que chequeo
 	int i = 0;
+	Grilla<EstadoCultivo> estado0 = _estado;
 	while (i < campo().dimensiones().ancho){
 		int j = 0;
 		while (j < campo().dimensiones().largo){
 			//Es necesario verificar que las parcelas vecinas existan.
-			if(enRangoConPlaga(i+1,j)||enRangoConPlaga(i-1,j)||enRangoConPlaga(i,j+1)||enRangoConPlaga(i,j-1)){
+			if(enRangoConPlaga(i+1,j, estado0)||enRangoConPlaga(i-1,j, estado0)||
+				enRangoConPlaga(i,j+1, estado0)||enRangoConPlaga(i,j-1, estado0)){
 				_estado.parcelas[i][j] = ConPlaga;
 			}
 			j++;
@@ -94,31 +97,36 @@ void Sistema::seExpandePlaga()
 void Sistema::despegar(const Drone & d)
 {
 	Posicion pos;
+	bool seMueve = false;
 
 	if (parcelaLibre(d.posicionActual().x - 1, d.posicionActual().y) &&
 			enRango(d.posicionActual().x - 1, d.posicionActual().y)){
 		pos.x = d.posicionActual().x - 1;
 		pos.y = d.posicionActual().y;
+		seMueve = true;
 	}
-	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1) &&
+	else if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1) &&
 			enRango(d.posicionActual().x, d.posicionActual().y + 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y + 1;
+		seMueve = true;
 	}
-	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1) &&
+	else if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1) &&
 			enRango(d.posicionActual().x, d.posicionActual().y - 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y - 1;
+		seMueve = true;
 	}
-	if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y) &&
+	else if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y) &&
 			enRango(d.posicionActual().x + 1, d.posicionActual().y)){
 		pos.x = d.posicionActual().x + 1;
 		pos.y = d.posicionActual().y;
+		seMueve = true;
 	}
 
 	unsigned int i = 0;
 	while (i < _enjambre.size()){
-		if (_enjambre[i].id() == d.id()){
+		if (seMueve && (_enjambre[i].id() == d.id())){
 			_enjambre[i].moverA(pos);
 		}
 		i++;
@@ -128,8 +136,8 @@ void Sistema::despegar(const Drone & d)
 bool Sistema::listoParaCosechar() const
 {
 	int i = 0;
-	int parcelasListas = 0;
-	//int cantidadParcelas = 0;
+	float parcelasListas = 0;
+	float cantidadParcelas = 0;
 
 	//En vez de contar cantidadParcelas podemos hacer ancho * largo
 	while (i < campo().dimensiones().ancho){
@@ -138,17 +146,22 @@ bool Sistema::listoParaCosechar() const
 			Posicion pos;
 			pos.x = i;
 			pos.y = j;
-			//if (_estado.parcelas[i][j] == ListoParaCosechar){
 			if (estadoDelCultivo(pos) == ListoParaCosechar){
+			//if (estadoDelCultivo(pos) == ListoParaCosechar){
 				parcelasListas++;
 			}
-			//cantidadParcelas++;
+			cantidadParcelas++;
 			j++;
 		}
 		i++;
 	}
-	//return (parcelasListas/cantidadParcelas) > 0.9;
-	return ((parcelasListas/(campo().dimensiones().ancho * campo().dimensiones().largo)) >= 0.9);
+
+	int res = parcelasListas/cantidadParcelas;
+	bool result = res >= 0.9;
+	//std::cout << ((parcelasListas/cantidadParcelas) >= 0.9);
+	//return ((parcelasListas/cantidadParcelas) >= 0.9);
+	//return ((parcelasListas/(campo().dimensiones().ancho * campo().dimensiones().largo)) >= 0.9);
+	return result;
 }
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
@@ -313,7 +326,7 @@ std::ostream & operator<<(std::ostream & os, const Sistema & s)
 
 
 /********************** AUX *****************************/
-bool Sistema::enRangoConPlaga(int x, int y) const{
+bool Sistema::enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const{
 	bool res = true;
 	Posicion pos;
 	pos.x = x;
@@ -321,11 +334,14 @@ bool Sistema::enRangoConPlaga(int x, int y) const{
 
 	if(enRango(x,y)){
 		if(campo().contenido(pos) == Cultivo){
-			res = res && _estado.parcelas[x][y] == ConPlaga;
+			res = estado0.parcelas[x][y] == ConPlaga;
 		}
 		else{
 			res = false;
 		}
+	}
+	else{
+		res = false;
 	}
 	return res;
 }

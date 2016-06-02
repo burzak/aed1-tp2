@@ -49,7 +49,7 @@ class Sistema {
         // Auxiliares
         bool enRango(int x, int y) const;
         bool enRango(const Posicion p) const;
-        bool enRangoConPlaga(int x, int y) const;
+        bool enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const;
         Posicion posicionGranero() const;
         bool enRangoCultivable(int x, int y) const;
         bool enRangoCultivableLibre(int x, int y) const;
