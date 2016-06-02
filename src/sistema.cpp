@@ -146,11 +146,13 @@ bool Sistema::listoParaCosechar() const
 			Posicion pos;
 			pos.x = i;
 			pos.y = j;
-			if (estadoDelCultivo(pos) == ListoParaCosechar){
-			//if (estadoDelCultivo(pos) == ListoParaCosechar){
-				parcelasListas++;
+			if(campo().contenido(pos) == Cultivo){
+				if (estadoDelCultivo(pos) == ListoParaCosechar){
+				//if (estadoDelCultivo(pos) == ListoParaCosechar){
+					parcelasListas++;
+				}
+				cantidadParcelas++;
 			}
-			cantidadParcelas++;
 			j++;
 		}
 		i++;
