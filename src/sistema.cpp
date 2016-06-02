@@ -120,20 +120,13 @@ void Sistema::despegar(const Drone & d)
 		pos.y = d.posicionActual().y;
 		seMueve = true;
 	}
-	std::cout << std::endl <<"se mueve:" << seMueve << std::endl;
-	std::cout << std::endl <<"Pre while" << std::endl;
 	unsigned int i = 0;
 	while (i < _enjambre.size()){
-		std::cout << std::endl <<"in while pre if" << std::endl;
 		if (seMueve && (_enjambre[i].id() == d.id())){
 			_enjambre[i].moverA(pos);
-			std::cout << std::endl << _enjambre[i].posicionActual() << std::endl;
 		}
-		std::cout << std::endl <<"in while post if" << std::endl;
 		i++;
 	}
-	std::cout << std::endl <<"Post while" << std::endl;
-
 }
 
 bool Sistema::listoParaCosechar() const
