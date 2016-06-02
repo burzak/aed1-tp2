@@ -99,38 +99,41 @@ void Sistema::despegar(const Drone & d)
 	Posicion pos;
 	bool seMueve = false;
 
-	if (parcelaLibre(d.posicionActual().x - 1, d.posicionActual().y) &&
-			enRango(d.posicionActual().x - 1, d.posicionActual().y)){
+	if (enRangoCultivableLibre(d.posicionActual().x - 1, d.posicionActual().y)){
+			//enRango(d.posicionActual().x - 1, d.posicionActual().y)){
 		pos.x = d.posicionActual().x - 1;
 		pos.y = d.posicionActual().y;
 		seMueve = true;
 	}
-	else if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1) &&
-			enRango(d.posicionActual().x, d.posicionActual().y + 1)){
+	else if (enRangoCultivableLibre(d.posicionActual().x, d.posicionActual().y + 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y + 1;
 		seMueve = true;
 	}
-	else if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1) &&
-			enRango(d.posicionActual().x, d.posicionActual().y - 1)){
+	else if (enRangoCultivableLibre(d.posicionActual().x, d.posicionActual().y - 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y - 1;
 		seMueve = true;
 	}
-	else if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y) &&
-			enRango(d.posicionActual().x + 1, d.posicionActual().y)){
+	else if (enRangoCultivableLibre(d.posicionActual().x + 1, d.posicionActual().y)){
 		pos.x = d.posicionActual().x + 1;
 		pos.y = d.posicionActual().y;
 		seMueve = true;
 	}
-
+	std::cout << std::endl <<"se mueve:" << seMueve << std::endl;
+	std::cout << std::endl <<"Pre while" << std::endl;
 	unsigned int i = 0;
 	while (i < _enjambre.size()){
+		std::cout << std::endl <<"in while pre if" << std::endl;
 		if (seMueve && (_enjambre[i].id() == d.id())){
 			_enjambre[i].moverA(pos);
+			std::cout << std::endl << _enjambre[i].posicionActual() << std::endl;
 		}
+		std::cout << std::endl <<"in while post if" << std::endl;
 		i++;
 	}
+	std::cout << std::endl <<"Post while" << std::endl;
+
 }
 
 bool Sistema::listoParaCosechar() const
@@ -159,7 +162,7 @@ bool Sistema::listoParaCosechar() const
 	}
 	//Magia matematica para no comparar floats.
 	int res = (parcelasListas/cantidadParcelas)*100;
-	
+
 	return res >= 90;
 
 }
@@ -183,8 +186,8 @@ void Sistema::fertilizarPorFilas()
 	while (i < campo().dimensiones().largo){
 		unsigned int pasos = 0;
 		pasos = pasosIzquierdaPosibles(i);
-		
-		
+
+
 		//Busco el drone para modificarlo
 		int indiceDrone;
 		unsigned int j = 0;
@@ -294,7 +297,7 @@ void Sistema::volarYSensar(const Drone & d)
 	if(seMovio == true){
 		modificarCultivoYDrone(targetPos, drone);
 	}
-	
+
 }
 
 
@@ -379,17 +382,19 @@ bool Sistema::parcelaLibre(int x, int y) const{
 }
 
 bool Sistema::enRangoCultivableLibre(int x, int y) const{
-	bool res = true;
+	bool res = enRango(x, y);
 	Posicion pos;
 	pos.x = x;
 	pos.y = y;
 
-	res = res && (campo().contenido(pos) == Cultivo);
+	if (enRango(x, y)){
+		res = res && (campo().contenido(pos) == Cultivo);
 
-	unsigned int i = 0;
-	while (i < enjambreDrones().size()){
-		res = res && (enjambreDrones()[i].posicionActual().x != x && enjambreDrones()[i].posicionActual().y != y);
-		i++;
+		unsigned int i = 0;
+		while (i < enjambreDrones().size()){
+			res = res && ((enjambreDrones()[i].posicionActual().x != x) || (enjambreDrones()[i].posicionActual().y != y));
+			i++;
+		}
 	}
 	return res;
 }
@@ -429,7 +434,7 @@ Posicion Sistema::posG() const{
 
 int Sistema::pasosIzquierdaPosibles(int y){
 	Drone d;
-	
+
 	int i = 0;
 	while (i < enjambreDrones().size()){
 		if (enjambreDrones()[i].posicionActual().y == y){
@@ -437,9 +442,9 @@ int Sistema::pasosIzquierdaPosibles(int y){
 		}
 		i++;
 	}
-	
+
 	int posX = d.posicionActual().x;
-	
+
 	i = posX;
 	//Los inicializo en -1 para que en caso que no haya ni G ni C en la fila se pueda usar como limite
 	int xGranero = -1;
