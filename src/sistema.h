@@ -57,6 +57,7 @@ class Sistema {
         static Posicion vecinoAlOeste(const Posicion &p);
 
         //nuestras
+        Posicion posG() const;
         int pasosIzquierdaPosibles(int y);
         int mayor(int a, int b);
         int menor(int a, int b);

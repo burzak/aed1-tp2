@@ -166,6 +166,15 @@ bool Sistema::listoParaCosechar() const
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
 {
+	int i = 0;
+	while(i < enjambreDrones().size()){
+		if(enjambreDrones()[i].bateria() < b){
+			_enjambre[i].setBateria(100);
+			_enjambre[i].cambiarPosicionActual(posG());
+			_enjambre[i].borrarVueloRealizado();
+		}
+		i++;
+	}
 }
 
 void Sistema::fertilizarPorFilas()
@@ -395,6 +404,27 @@ bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &pro
 	}
 
 	return res;
+}
+
+Posicion Sistema::posG() const{
+	Posicion posG;
+	int i = 0;
+	while(i < campo().dimensiones().ancho){
+		int j = 0;
+		while(j < campo().dimensiones().largo){
+			Posicion posAux;
+			posAux.x = i;
+			posAux.y = j;
+			if(campo().contenido(posAux) == Granero){
+				posG.x = posAux.x;
+				posG.y = posAux.y;
+			}
+			j++;
+		}
+		i++;
+	}
+
+	return posG;
 }
 
 int Sistema::pasosIzquierdaPosibles(int y){
