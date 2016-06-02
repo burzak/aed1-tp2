@@ -157,13 +157,11 @@ bool Sistema::listoParaCosechar() const
 		}
 		i++;
 	}
+	//Magia matematica para no comparar floats.
+	int res = (parcelasListas/cantidadParcelas)*100;
+	
+	return res >= 90;
 
-	int res = parcelasListas/cantidadParcelas;
-	bool result = res >= 0.9;
-	//std::cout << ((parcelasListas/cantidadParcelas) >= 0.9);
-	//return ((parcelasListas/cantidadParcelas) >= 0.9);
-	//return ((parcelasListas/(campo().dimensiones().ancho * campo().dimensiones().largo)) >= 0.9);
-	return result;
 }
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
