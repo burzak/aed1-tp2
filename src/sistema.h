@@ -49,12 +49,19 @@ class Sistema {
         // Auxiliares
         bool enRango(int x, int y) const;
         bool enRango(const Posicion p) const;
-        bool enRangoConPlaga(int x, int y) const;
+        bool enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const;
         Posicion posicionGranero() const;
         bool enRangoCultivable(int x, int y) const;
         bool enRangoCultivableLibre(int x, int y) const;
         bool parcelaLibre(int x, int y) const;
         static Posicion vecinoAlOeste(const Posicion &p);
+
+        //nuestras
+        Posicion posG() const;
+        int pasosIzquierdaPosibles(int y);
+        int mayor(int a, int b);
+        int menor(int a, int b);
+        void modificarCultivoYDrone(Posicion pos, Drone &d);
 
         static bool tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar);
         // soluci�n --> deber�amos agregarla como funciones globales en tipos.h

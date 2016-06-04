@@ -1,6 +1,7 @@
 #include "sistema.h"
 #include <algorithm>
 #include <sstream>
+#include <ostream>
 
 Sistema::Sistema()
 {
@@ -12,14 +13,16 @@ Sistema::Sistema(const Campo & c, const Secuencia<Drone>& ds)
 	Dimension dim = _campo.dimensiones();
 
 	// revisar/preguntar porque no podemos pasarle las dimensiones a Grilla
-	_estado = Grilla<EstadoCultivo>();
+	_estado = Grilla<EstadoCultivo>(dim);
 
 	int i = 0;
 	while (i < dim.ancho) {
 		int j = 0;
 		while (j < dim.largo) {
-			_estado.parcelas[i][j] = NoSensado;
+			_estado.parcelas[i][j] = RecienSembrado;
+			j++;
 		}
+		i++;
 	}
 
 	_enjambre = ds;
@@ -32,7 +35,7 @@ const Campo & Sistema::campo() const
 
 EstadoCultivo Sistema::estadoDelCultivo(const Posicion & p) const
 {
-	return EstadoCultivo();
+	return _estado.parcelas[p.x][p.y];
 }
 
 const Secuencia<Drone>& Sistema::enjambreDrones() const
@@ -44,16 +47,21 @@ void Sistema::crecer()
 {
 	int i = 0;
 	while(i < _campo.dimensiones().ancho){
-			int j = 0;
-			while (j < _campo.dimensiones().largo) {
-				if (_estado.parcelas[i][j] == RecienSembrado){
+		int j = 0;
+		while (j < _campo.dimensiones().largo) {
+			Posicion pos;
+			pos.x = i;
+			pos.y = j;
+			if (campo().contenido(pos) == Cultivo){
+				if (estadoDelCultivo(pos) == RecienSembrado){
 					_estado.parcelas[i][j] = EnCrecimiento;
 				}
-				if (_estado.parcelas[i][j] == EnCrecimiento){
+				else if (estadoDelCultivo(pos) == EnCrecimiento){
 					_estado.parcelas[i][j] = ListoParaCosechar;
 				}
-				j++;
 			}
+			j++;
+		}
 		i++;
 	}
 }
@@ -69,13 +77,16 @@ void Sistema::seVinoLaMaleza(const Secuencia<Posicion>& ps)
 
 void Sistema::seExpandePlaga()
 {
+	//Probablemente haya que arreglar porque estoy expandiendo la plaga al mismo tiempo que chequeo
 	int i = 0;
-	while (i < _campo.dimensiones().ancho){
+	Grilla<EstadoCultivo> estado0 = _estado;
+	while (i < campo().dimensiones().ancho){
 		int j = 0;
-		while (j < _campo.dimensiones().largo){
+		while (j < campo().dimensiones().largo){
 			//Es necesario verificar que las parcelas vecinas existan.
-			if(enRangoConPlaga(i+1,j)||enRangoConPlaga(i-1,j)||enRangoConPlaga(i,j+1)||enRangoConPlaga(i,j-1)){
-				_estado.parcelas[i][j] = ConMaleza;
+			if(enRangoConPlaga(i+1,j, estado0)||enRangoConPlaga(i-1,j, estado0)||
+				enRangoConPlaga(i,j+1, estado0)||enRangoConPlaga(i,j-1, estado0)){
+				_estado.parcelas[i][j] = ConPlaga;
 			}
 			j++;
 		}
@@ -86,27 +97,32 @@ void Sistema::seExpandePlaga()
 void Sistema::despegar(const Drone & d)
 {
 	Posicion pos;
+	bool seMueve = false;
 
-	if (parcelaLibre(d.posicionActual().x + 1, d.posicionActual().y)){
-		pos.x = d.posicionActual().x + 1;
-		pos.y = d.posicionActual().y;
-	}
-	if (parcelaLibre(d.posicionActual().x - 1, d.posicionActual().y)){
+	if (enRangoCultivableLibre(d.posicionActual().x - 1, d.posicionActual().y)){
+			//enRango(d.posicionActual().x - 1, d.posicionActual().y)){
 		pos.x = d.posicionActual().x - 1;
 		pos.y = d.posicionActual().y;
+		seMueve = true;
 	}
-	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y + 1)){
+	else if (enRangoCultivableLibre(d.posicionActual().x, d.posicionActual().y + 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y + 1;
+		seMueve = true;
 	}
-	if (parcelaLibre(d.posicionActual().x, d.posicionActual().y - 1)){
+	else if (enRangoCultivableLibre(d.posicionActual().x, d.posicionActual().y - 1)){
 		pos.x = d.posicionActual().x;
 		pos.y = d.posicionActual().y - 1;
+		seMueve = true;
 	}
-
+	else if (enRangoCultivableLibre(d.posicionActual().x + 1, d.posicionActual().y)){
+		pos.x = d.posicionActual().x + 1;
+		pos.y = d.posicionActual().y;
+		seMueve = true;
+	}
 	unsigned int i = 0;
 	while (i < _enjambre.size()){
-		if (_enjambre[i].id() == d.id()){
+		if (seMueve && (_enjambre[i].id() == d.id())){
 			_enjambre[i].moverA(pos);
 		}
 		i++;
@@ -119,27 +135,100 @@ bool Sistema::listoParaCosechar() const
 	float parcelasListas = 0;
 	float cantidadParcelas = 0;
 
+	//En vez de contar cantidadParcelas podemos hacer ancho * largo
 	while (i < campo().dimensiones().ancho){
 		int j = 0;
 		while (j < campo().dimensiones().largo){
-			if (_estado.parcelas[i][j] == ListoParaCosechar){
-				parcelasListas++;
+			Posicion pos;
+			pos.x = i;
+			pos.y = j;
+			if(campo().contenido(pos) == Cultivo){
+				if (estadoDelCultivo(pos) == ListoParaCosechar){
+				//if (estadoDelCultivo(pos) == ListoParaCosechar){
+					parcelasListas++;
+				}
+				cantidadParcelas++;
 			}
-			cantidadParcelas++;
 			j++;
 		}
 		i++;
 	}
-	return (parcelasListas/parcelasListas) >= 0.9;
+	//Magia matematica para no comparar floats.
+	int res = (parcelasListas/cantidadParcelas)*100;
+
+	return res >= 90;
+
 }
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
 {
+	int i = 0;
+	while(i < enjambreDrones().size()){
+		if(enjambreDrones()[i].bateria() < b){
+			_enjambre[i].setBateria(100);
+			_enjambre[i].cambiarPosicionActual(posG());
+			_enjambre[i].borrarVueloRealizado();
+		}
+		i++;
+	}
 }
 
 void Sistema::fertilizarPorFilas()
 {
+	unsigned int i = 0;
+	while (i < campo().dimensiones().largo){
+		unsigned int pasos = 0;
+		pasos = pasosIzquierdaPosibles(i);
 
+
+		//Busco el drone para modificarlo
+		int indiceDrone;
+		unsigned int j = 0;
+		while (j < _enjambre.size()){
+			if(_enjambre[j].posicionActual().y == i){
+				indiceDrone = j;
+			}
+			j++;
+		}
+
+		int posXIni = _enjambre[indiceDrone].posicionActual().x;
+
+		//Fertilizo las parcelas por las que paso y veo cuanto fertilizante hay que sacar.
+		int fertUsado = 0;
+		j = 0;
+		while(j < pasos){
+			Posicion pos;
+			pos.y = i;
+			pos.x = posXIni - j;
+			if(campo().contenido(pos) == Cultivo){
+				if(estadoDelCultivo(pos) == EnCrecimiento || estadoDelCultivo(pos) == RecienSembrado){
+					fertUsado++;
+					_estado.parcelas[posXIni - j][i] = ListoParaCosechar;
+				}
+			}
+			j++;
+		}
+
+
+		j = 0;
+		while(j <= fertUsado){
+			_enjambre[indiceDrone].sacarProducto(Fertilizante);
+			j++;
+		}
+
+		_enjambre[indiceDrone].setBateria(_enjambre[indiceDrone].bateria() - pasos);
+
+		j = 0;
+		while(j <= posXIni){
+			Posicion pos;
+			pos.x = posXIni - j;
+			pos.y = i;
+			_enjambre[indiceDrone].moverA(pos);
+			j++;
+		}
+
+		i++;
+	}
 }
 
 void Sistema::volarYSensar(const Drone & d)
@@ -158,77 +247,51 @@ void Sistema::volarYSensar(const Drone & d)
 		i++;
 	}
 
-	Drone& droneUsado = _enjambre[indiceDrone];
+	Drone& drone = _enjambre[indiceDrone];
+	int posX = drone.posicionActual().x;
+	int posY = drone.posicionActual().y;
+	bool seMovio = false;
 
 	//El granero cuenta como parcelaDisponible? Falta la aux en la especificacion
 
 	Posicion targetPos;
 	//Estos muchos ifs no me gustan demasiado
-	if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x + 1, droneUsado.posicionActual().y)){
-		targetPos.x = droneUsado.posicionActual().x + 1;
-		targetPos.y = droneUsado.posicionActual().y;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	if (drone.bateria() >0 && enRangoCultivableLibre(posX + 1, posY)){
+		targetPos.x = posX + 1;
+		targetPos.y = posY;
+		drone.moverA(targetPos);
+		drone.setBateria(drone.bateria() - 1);
+		seMovio = true;
 	}
-	else if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x - 1, droneUsado.posicionActual().y)){
-		targetPos.x = droneUsado.posicionActual().x - 1;
-		targetPos.y = droneUsado.posicionActual().y;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	else if (drone.bateria() >0 && enRangoCultivableLibre(posX - 1, posY)){
+		targetPos.x = posX - 1;
+		targetPos.y = posY;
+		drone.moverA(targetPos);
+		drone.setBateria(drone.bateria() - 1);
+		seMovio = true;
 	}
-	else if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x, droneUsado.posicionActual().y + 1)){
-		targetPos.x = droneUsado.posicionActual().x;
-		targetPos.y = droneUsado.posicionActual().y + 1;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	else if (drone.bateria() >0 && enRangoCultivableLibre(posX, posY + 1)){
+		targetPos.x = posX;
+		targetPos.y = posY + 1;
+		drone.moverA(targetPos);
+		drone.setBateria(drone.bateria() - 1);
+		seMovio = true;
 	}
-	else if (droneUsado.bateria() >0 && enRangoCultivableLibre(droneUsado.posicionActual().x, droneUsado.posicionActual().y - 1)){
-		targetPos.x = droneUsado.posicionActual().x;
-		targetPos.y = droneUsado.posicionActual().y - 1;
-		droneUsado.moverA(targetPos);
-		droneUsado.setBateria(droneUsado.bateria() - 1);
+	else if (drone.bateria() >0 && enRangoCultivableLibre(posX, posY - 1)){
+		targetPos.x = posX;
+		targetPos.y = posY - 1;
+		drone.moverA(targetPos);
+		drone.setBateria(d.bateria() - 1);
+		seMovio = true;
 	}
 
 	//Si la parcela esta noSensada se le puede poner cualquier verdura (eh, entienden? Cualquier verdura para cultivar!)
 
-	//Esta variable es por cuestiones meramente esteticas
-	EstadoCultivo estado = estadoDelCultivo(targetPos);
+	if(seMovio == true){
+		modificarCultivoYDrone(targetPos, drone);
+	}
 
-	if (estado == NoSensado){
-		_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-	}
-	else if ((estado == RecienSembrado || estado == EnCrecimiento) &&
-			tieneUnProducto(droneUsado.productosDisponibles(), Fertilizante)) {
-
-		_estado.parcelas[targetPos.x][targetPos.y] = ListoParaCosechar;
-		droneUsado.sacarProducto(Fertilizante);
-		//Verificar si fertilizar gasta bateria.
-		//Verificar si queda listo para cosechar cuando esta EnCrecimiento y RecienSembrado
-	}
-	else if (estado == ConPlaga){
-		if (droneUsado.bateria() >=10 && tieneUnProducto(droneUsado.productosDisponibles(), Plaguicida)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(Plaguicida);
-			droneUsado.setBateria(droneUsado.bateria() - 10);
-		}
-		else if (droneUsado.bateria() >=5 && tieneUnProducto(droneUsado.productosDisponibles(), PlaguicidaBajoConsumo)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(PlaguicidaBajoConsumo);
-			droneUsado.setBateria(droneUsado.bateria() - 5);
-		}
-	}
-	else if (estado == ConMaleza){
-		if (droneUsado.bateria() >=5 && tieneUnProducto(droneUsado.productosDisponibles(), Herbicida)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(Herbicida);
-			droneUsado.setBateria(droneUsado.bateria() - 5);
-		}
-		else if (droneUsado.bateria() >=5 && tieneUnProducto(droneUsado.productosDisponibles(), HerbicidaLargoAlcance)){
-			_estado.parcelas[targetPos.x][targetPos.y] = RecienSembrado;
-			droneUsado.sacarProducto(HerbicidaLargoAlcance);
-			droneUsado.setBateria(droneUsado.bateria() - 5);
-		}
-	}
+}
 
 
 	/***RECORDAR***/
@@ -236,9 +299,6 @@ void Sistema::volarYSensar(const Drone & d)
 	//Cambiar la bateria cuando se aplica un producto o similar
 
 
-
-
-}
 
 void Sistema::mostrar(std::ostream & os) const
 {
@@ -271,11 +331,32 @@ std::ostream & operator<<(std::ostream & os, const Sistema & s)
 
 
 /********************** AUX *****************************/
-bool Sistema::enRangoConPlaga(int x, int y) const{
+bool Sistema::enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const{
 	bool res = true;
-	res = res && (x >= 0) && (x < _campo.dimensiones().ancho);
-	res = res && (y >= 0) && (y < _campo.dimensiones().largo);
-	res = res && _estado.parcelas[x][y] == ConPlaga;
+	Posicion pos;
+	pos.x = x;
+	pos.y = y;
+
+	if(enRango(x,y)){
+		if(campo().contenido(pos) == Cultivo){
+			res = estado0.parcelas[x][y] == ConPlaga;
+		}
+		else{
+			res = false;
+		}
+	}
+	else{
+		res = false;
+	}
+	return res;
+}
+
+bool Sistema::enRango(int x, int y) const{
+	bool res;
+	bool xValida = (x >= 0 && x < campo().dimensiones().ancho);
+	bool yValida = (y >= 0 && y < campo().dimensiones().largo);
+	res = xValida && yValida;
+
 	return res;
 }
 
@@ -294,17 +375,19 @@ bool Sistema::parcelaLibre(int x, int y) const{
 }
 
 bool Sistema::enRangoCultivableLibre(int x, int y) const{
-	bool res = true;
+	bool res = enRango(x, y);
 	Posicion pos;
 	pos.x = x;
 	pos.y = y;
 
-	res = res && (campo().contenido(pos) == Cultivo);
+	if (enRango(x, y)){
+		res = res && (campo().contenido(pos) == Cultivo);
 
-	unsigned int i = 0;
-	while (i < enjambreDrones().size()){
-		res = res && (enjambreDrones()[i].posicionActual().x != x && enjambreDrones()[i].posicionActual().y != y);
-		i++;
+		unsigned int i = 0;
+		while (i < enjambreDrones().size()){
+			res = res && ((enjambreDrones()[i].posicionActual().x != x) || (enjambreDrones()[i].posicionActual().y != y));
+			i++;
+		}
 	}
 	return res;
 }
@@ -320,5 +403,151 @@ bool Sistema::tieneUnProducto(const Secuencia<Producto> &ps, const Producto &pro
 
 	return res;
 }
+
+Posicion Sistema::posG() const{
+	Posicion posG;
+	int i = 0;
+	while(i < campo().dimensiones().ancho){
+		int j = 0;
+		while(j < campo().dimensiones().largo){
+			Posicion posAux;
+			posAux.x = i;
+			posAux.y = j;
+			if(campo().contenido(posAux) == Granero){
+				posG.x = posAux.x;
+				posG.y = posAux.y;
+			}
+			j++;
+		}
+		i++;
+	}
+
+	return posG;
+}
+
+int Sistema::pasosIzquierdaPosibles(int y){
+	Drone d;
+
+	int i = 0;
+	while (i < enjambreDrones().size()){
+		if (enjambreDrones()[i].posicionActual().y == y){
+			d = enjambreDrones()[i];
+		}
+		i++;
+	}
+
+	int posX = d.posicionActual().x;
+
+	i = posX;
+	//Los inicializo en -1 para que en caso que no haya ni G ni C en la fila se pueda usar como limite
+	int xGranero = -1;
+	int xCasa = -1;
+	while (i >= 0){
+		Posicion pos;
+		pos.x = i;
+		pos.y = y;
+		if(campo().contenido(pos) == Casa){
+			xCasa = i;
+		}
+		if(campo().contenido(pos) == Granero){
+			xGranero = i;
+		}
+		i--;
+	}
+
+	int fertilizante = 0;
+	i = 0;
+	while(i < d.productosDisponibles().size()){
+		if(d.productosDisponibles()[i] == Fertilizante){
+			fertilizante++;
+		}
+		i++;
+	}
+
+	i = posX;
+	int pasosFert = 0;
+	while(i > mayor(xCasa, xGranero)){
+		Posicion pos;
+		pos.x = i;
+		pos.y = y;
+		if((estadoDelCultivo(pos) != EnCrecimiento && estadoDelCultivo(pos) != RecienSembrado) &&
+			fertilizante > 0){
+			pasosFert++;
+		}
+		if((estadoDelCultivo(pos) == EnCrecimiento || estadoDelCultivo(pos) == RecienSembrado) &&
+			fertilizante > 0){
+			pasosFert++;
+			fertilizante--;
+		}
+		i--;
+	}
+
+	return menor(pasosFert, menor(d.bateria(), menor(posX - xGranero, posX - xCasa)));
+
+
+}
+
+int Sistema::mayor(int a, int b){
+	int res;
+	if(a > b){
+		res = a;
+	}
+	else {
+		res = b;
+	}
+	return res;
+}
+
+int Sistema::menor(int a, int b){
+		int res;
+	if(a < b){
+		res = a;
+	}
+	else {
+		res = b;
+	}
+	return res;
+}
+
+void Sistema::modificarCultivoYDrone(Posicion pos, Drone &d){
+	EstadoCultivo estado = estadoDelCultivo(pos);
+
+	if (estado == NoSensado){
+		_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+	}
+	else if ((estado == RecienSembrado || estado == EnCrecimiento) &&
+				tieneUnProducto(d.productosDisponibles(), Fertilizante)) {
+
+		_estado.parcelas[pos.x][pos.y] = ListoParaCosechar;
+		d.sacarProducto(Fertilizante);
+		//Verificar si fertilizar gasta bateria.
+		//Verificar si queda listo para cosechar cuando esta EnCrecimiento y RecienSembrado
+	}
+	else if (estado == ConPlaga){
+		if (d.bateria() >=10 && tieneUnProducto(d.productosDisponibles(), Plaguicida)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(Plaguicida);
+			d.setBateria(d.bateria() - 10);
+		}
+		else if (d.bateria() >=5 && tieneUnProducto(d.productosDisponibles(), PlaguicidaBajoConsumo)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(PlaguicidaBajoConsumo);
+			d.setBateria(d.bateria() - 5);
+		}
+	}
+	else if (estado == ConMaleza){
+		if (d.bateria() >=5 && tieneUnProducto(d.productosDisponibles(), Herbicida)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(Herbicida);
+			d.setBateria(d.bateria() - 5);
+		}
+		else if (d.bateria() >=5 && tieneUnProducto(d.productosDisponibles(), HerbicidaLargoAlcance)){
+			_estado.parcelas[pos.x][pos.y] = RecienSembrado;
+			d.sacarProducto(HerbicidaLargoAlcance);
+			d.setBateria(d.bateria() - 5);
+		}
+	}
+}
+
 
 //A Galimba no le gusta que usemos  &=  :(

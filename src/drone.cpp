@@ -12,6 +12,10 @@ Drone::Drone(ID i, const std::vector<Producto>& ps)
 	setBateria(100);
 	_enVuelo = false;
 	_productos = ps;
+	Posicion p;
+	p.x = 0;
+	p.y = 0;
+	_posicionActual = p;
 }
 
 ID Drone::id() const
@@ -80,7 +84,8 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 		}
 		n++;
 	}
-	return Secuencia<InfoVueloCruzado>();
+	//hay que sacar repetidos y todo eso
+	return vuelosCruzados;
 }
 
 void Drone::mostrar(std::ostream & os) const
@@ -172,7 +177,11 @@ void Drone::moverA(const Posicion pos)
 {
 	_enVuelo = true;
 	_trayectoria.push_back(pos);
-	cambiarPosicionActual(pos); // por invariante agregamos esta linea
+	_posicionActual.x = pos.x;
+	_posicionActual.y = pos.y;
+
+
+	//cambiarPosicionActual(pos); // por invariante agregamos esta linea
 	// debemos verificar invariante movimientoOK? pos tiene que ser un movimiento valido?
 }
 
@@ -189,7 +198,8 @@ void Drone::borrarVueloRealizado()
 
 void Drone::cambiarPosicionActual(const Posicion p)
 {
-	_posicionActual = p;
+	_posicionActual.x = p.x;
+	_posicionActual.y = p.y;
 }
 
 void Drone::sacarProducto(const Producto p)
@@ -200,6 +210,7 @@ void Drone::sacarProducto(const Producto p)
 		if (_productos[n] == p) {
 			indiceProducto = n;
 		}
+		n++;
 	}
 	_productos.erase(_productos.begin() + indiceProducto);
 }
@@ -210,7 +221,12 @@ bool Drone::operator==(const Drone & otroDrone) const
 	res = res && id() == otroDrone.id();
 	res = res && bateria() == otroDrone.bateria();
 	res = res && enVuelo() == otroDrone.enVuelo();
-	res = res && vueloRealizado() == otroDrone.vueloRealizado();
+	unsigned int n = 0;
+	while (n < vueloRealizado().size()) {
+		res = res && vueloRealizado()[n] == otroDrone.vueloRealizado()[n];
+		n++;
+	}
+	res = res && vueloRealizado().size() == otroDrone.vueloRealizado().size();
 	res = res && posicionActual() == otroDrone.posicionActual();
 	res = res && mismosProductos(productosDisponibles(), otroDrone.productosDisponibles());
 	return res;
@@ -257,6 +273,7 @@ int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud
 			if (ds[j].vueloRealizado()[n] == pos) {
 				cant++;
 			}
+			j++;
 		}
 		if (cant > 1) {
 			total = total + cant;
