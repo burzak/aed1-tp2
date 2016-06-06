@@ -289,16 +289,17 @@ int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud
 	return total;
 }
 
+//bubble sort
 void Drone::ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados){
 	bool intercambiado = true;
 	while(intercambiado){
 		intercambiado = false;
 		int i = 0;
 		while(i < vuelosCruzados.size()-1){
-			if(a[i]>a[i+1]){
-				a[i] += a[i+1];
-				a[i+1] = a[i] - a[i+1];
-				a[i] -= a[i+j];
+			if(vuelosCruzados[i].cantidadCruces > vuelosCruzados[i+1].cantidadCruces){
+				vuelosCruzados[i].cantidadCruces += vuelosCruzados[i+1].cantidadCruces;
+				vuelosCruzados[i+1].cantidadCruces = vuelosCruzados[i].cantidadCruces - vuelosCruzados[i+1].cantidadCruces;
+				vuelosCruzados[i].cantidadCruces -= vuelosCruzados[i+1].cantidadCruces;
 				intercambiado = true;
 			}
 			i++;
