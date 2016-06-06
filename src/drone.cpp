@@ -1,6 +1,7 @@
 #include "drone.h"
 #include "campo.h"
 #include "aux.h"
+#include <ostream>
 
 Drone::Drone()
 {
@@ -84,9 +85,12 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 		}
 		n++;
 	}
+
 	//hay que sacar repetidos y todo eso
-	return vuelosCruzados;
+	Secuencia<InfoVueloCruzado> res = elimCruzadosRepetidos(vuelosCruzados);
+	return ordenarVuelosCruzados(res);
 }
+
 
 void Drone::mostrar(std::ostream & os) const
 {
@@ -283,4 +287,40 @@ int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud
 		n++;
 	}
 	return total;
+}
+
+void Drone::ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados){
+	bool intercambiado = true;
+	while(intercambiado){
+		intercambiado = false;
+		int i = 0;
+		while(i < vuelosCruzados.size()-1){
+			if(a[i]>a[i+1]){
+				a[i] += a[i+1];
+				a[i+1] = a[i] - a[i+1];
+				a[i] -= a[i+j];
+				intercambiado = true;
+			}
+			i++;
+		}
+	}
+}
+
+Secuencia<InfoVueloCruzado> Drone::elimCruzadosRepetidos(const Secuencia<InfoVueloCruzado>& vuelosCruzados){
+	Secuencia<InfoVueloCruzado> res;
+
+	unsigned int i = 0;
+	while(i < vuelosCruzados.size()){
+		bool repetido = false;
+		unsigned int j = i + 1;
+		while(j < vuelosCruzados.size()){
+			repetido = repetido || vuelosCruzados[i].posicion == vuelosCruzados[j].posicion;
+			j++;
+		}
+		if(!repetido){
+			res.push_back(vuelosCruzados[i]);
+		}
+		i++;
+	}
+	return res;
 }
