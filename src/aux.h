@@ -15,4 +15,7 @@ void imprimirLista(const Secuencia<std::string> & secuencia);
 
 std::ostream &operator<<(std::ostream &os, const Dimension &d);
 
+inline std::ostream & operator<<(std::ostream & os, const Posicion & p) { return os << "[" << p.x << "," << p.y << "]"; };
+
+
 #endif //AUX_H

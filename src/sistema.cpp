@@ -1,4 +1,5 @@
 #include "sistema.h"
+#include "drone.h"
 #include "aux.h"
 #include <algorithm>
 #include <sstream>
@@ -305,6 +306,7 @@ void Sistema::volarYSensar(const Drone & d)
 
 void Sistema::mostrar(std::ostream & os) const
 {
+	os << "Sistema: Drones: " << enjambreDrones().size() << " " << campo();
 }
 
 void Sistema::guardar(std::ostream & os) const
@@ -349,11 +351,13 @@ void Sistema::guardar(std::ostream & os) const
 void Sistema::cargar(std::istream & is)
 {
 	std::string non;
+	//adelanto hasta el campo
 	getline(is, non, '{');
 	getline(is, non, '{');
 	is.putback('{');
 	_campo.cargar(is);
 
+	// cargo todos los drones
 	char c;
 	while (c != ']') {
 		is.get(c);
@@ -365,9 +369,10 @@ void Sistema::cargar(std::istream & is)
 		}
 	}
 
+	// despues de los drones obtengo todo hasta el final que son los estados de cultivos
 	getline(is, non);
 	Secuencia<std::string> estadosCultivosFilas;
-	// con el substr saco el " " inicial!
+	// con el substr saco el " " inicial y el } final!
 	estadosCultivosFilas = cargarLista(non.substr(1, non.length()-2), "[", "]");
 
 	Secuencia<std::string> todosEstadosCultivos;
@@ -396,7 +401,23 @@ void Sistema::cargar(std::istream & is)
 
 bool Sistema::operator==(const Sistema & otroSistema) const
 {
-	return false;
+	bool res = true;
+	res == res && mismosDrones(enjambreDrones(), otroSistema.enjambreDrones());
+	res == res && campo() == otroSistema.campo();
+	Dimension dim = campo().dimensiones();
+	int x = 0;
+	while (res && x < dim.ancho) {
+		int y = 0;
+		while (res && y < dim.largo) {
+			Posicion p;
+			p.x = x;
+			p.y = y;
+			res = res && estadoDelCultivo(p) == otroSistema.estadoDelCultivo(p);
+			y++;
+		}
+		x++;
+	}
+	return res;
 }
 
 std::ostream & operator<<(std::ostream & os, const Sistema & s)
@@ -624,6 +645,30 @@ void Sistema::modificarCultivoYDrone(Posicion pos, Drone &d){
 			d.setBateria(d.bateria() - 5);
 		}
 	}
+}
+
+
+bool Sistema::mismosDrones(const Secuencia<Drone> & ds1, const Secuencia<Drone> & ds2) {
+	bool res = ds1.size() == ds2.size();
+  unsigned int n = 0;
+  while (res && n < ds1.size()) {
+		res = res && (cantidadDrones(ds1, ds1[n]) == cantidadDrones(ds2, ds1[n]));
+    res = res && (cantidadDrones(ds1, ds2[n]) == cantidadDrones(ds2, ds2[n]));
+    n++;
+  }
+  return res;
+}
+
+int Sistema::cantidadDrones(const Secuencia<Drone> & ds, const Drone & d) {
+  unsigned int n = 0;
+  int cant = 0;
+  while (n < ds.size()) {
+    if (ds[n] == d) {
+      cant++;
+    }
+    n++;
+  }
+  return cant;
 }
 
 

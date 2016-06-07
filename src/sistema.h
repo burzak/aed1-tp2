@@ -50,11 +50,9 @@ class Sistema {
         bool enRango(int x, int y) const;
         bool enRango(const Posicion p) const;
         bool enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const;
-        Posicion posicionGranero() const;
         bool enRangoCultivable(int x, int y) const;
         bool enRangoCultivableLibre(int x, int y) const;
         bool parcelaLibre(int x, int y) const;
-        static Posicion vecinoAlOeste(const Posicion &p);
 
         //nuestras
         Posicion posG() const;
@@ -62,11 +60,10 @@ class Sistema {
         int mayor(int a, int b);
         int menor(int a, int b);
         void modificarCultivoYDrone(Posicion pos, Drone &d);
+        static bool mismosDrones(const Secuencia<Drone> & ds1, const Secuencia<Drone> & ds2);
+        static int cantidadDrones(const Secuencia<Drone> & ds, const Drone & d);
 
         static bool tieneUnProducto(const Secuencia<Producto> &ps, const Producto &productoABuscar);
-        // soluci�n --> deber�amos agregarla como funciones globales en tipos.h
-        void split(const std::string &s, char delim, std::vector<std::string> &elems);
-        std::vector<std::string> split(const std::string &s, char delim);
 };
 
 // Definirlo usando mostrar, para poder usar << con este tipo.

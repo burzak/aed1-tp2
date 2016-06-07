@@ -47,9 +47,6 @@ class Drone{
         static void ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados);
     };
 
-// agregamos nosotros
-inline std::ostream & operator<<(std::ostream & os, const Posicion & p) { return os << "[" << p.x << "," << p.y << "]"; };
-
 // Definirlo usando mostrar, para poder usar << con este tipo.
 std::ostream & operator<<(std::ostream & os,const Drone & d);
 
