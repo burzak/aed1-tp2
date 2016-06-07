@@ -43,9 +43,9 @@ class Drone{
         static int cantidad(const Secuencia<Producto> lista, Producto producto);
         static int cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud);
         static bool mismosProductos(const Secuencia<Producto> lista1, const Secuencia<Producto> lista2);
-        Secuencia<InfoVueloCruzado> elimCruzadosRepetidos(const Secuencia<InfoVueloCruzado>& vuelosCruzados);
-        void ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados);
-    }; 
+        static Secuencia<InfoVueloCruzado> elimCruzadosRepetidos(const Secuencia<InfoVueloCruzado>& vuelosCruzados);
+        static void ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados);
+    };
 
 // agregamos nosotros
 inline std::ostream & operator<<(std::ostream & os, const Posicion & p) { return os << "[" << p.x << "," << p.y << "]"; };

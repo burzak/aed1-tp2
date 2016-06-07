@@ -88,7 +88,8 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 
 	//hay que sacar repetidos y todo eso
 	Secuencia<InfoVueloCruzado> res = elimCruzadosRepetidos(vuelosCruzados);
-	return ordenarVuelosCruzados(res);
+	ordenarVuelosCruzados(res);
+	return res;
 }
 
 
@@ -295,7 +296,7 @@ int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud
 //bubble sort
 void Drone::ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados){
 	bool intercambiado = true;
-	while(intercambiado){
+	while(intercambiado && vuelosCruzados.size() > 1){
 		intercambiado = false;
 		int i = 0;
 		while(i < vuelosCruzados.size()-1){
