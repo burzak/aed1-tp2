@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "factories.h"
 
-/*TEST(test_drone_lo_basico, guardar_y_cargar_funcionan_ok) {
+TEST(test_drone_lo_basico, guardar_y_cargar_funcionan_ok) {
     Drone d1(1, algunos_productos());
     d1.cambiarPosicionActual({1, 3});
 
@@ -18,8 +18,8 @@
     d2.cargar(in);
     in.close();
 
-    EXPECT_EQ(d1, d2);
-}*/
+    EXPECT_EQ(d2, d1);
+}
 
 TEST(test_drone_lo_basico, guardar_y_cargar_trayectoria_funciona_ok) {
     Drone d1(1, algunos_productos());
@@ -37,5 +37,5 @@ TEST(test_drone_lo_basico, guardar_y_cargar_trayectoria_funciona_ok) {
     d2.cargar(in);
     in.close();
 
-    EXPECT_EQ(d1, d2);
+    EXPECT_EQ(d2, d1);
 }

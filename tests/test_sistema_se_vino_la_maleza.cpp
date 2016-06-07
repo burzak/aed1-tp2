@@ -1,11 +1,13 @@
 #include <sistema.h>
 #include "gtest/gtest.h"
 #include "factories.h"
-#include "aux.h"
+#include "auxiliares.h"
 
 TEST(test_sistema_se_vino_la_maleza, lista_vacia_no_modifica_nada) {
-    Campo campo_3x3({0, 0}, {0, 1}, {3, 3});
-    Sistema s1(campo_3x3, algunos_drones());
+    Posicion posG{0, 0};
+    Campo campo_3x3(posG, {0, 1}, {3, 3});
+    Secuencia<Drone> ds = algunos_drones_en_granero(posG);
+    Sistema s1(campo_3x3, ds);
 
     s1._estado.parcelas[0][2] = RecienSembrado;
     s1._estado.parcelas[1][0] = NoSensado;
@@ -17,21 +19,23 @@ TEST(test_sistema_se_vino_la_maleza, lista_vacia_no_modifica_nada) {
 
     s1.seVinoLaMaleza({});
 
-    EXPECT_EQ(s1.estadoDelCultivo({0, 2}), RecienSembrado);
-    EXPECT_EQ(s1.estadoDelCultivo({1, 0}), NoSensado);
-    EXPECT_EQ(s1.estadoDelCultivo({1, 1}), RecienSembrado);
-    EXPECT_EQ(s1.estadoDelCultivo({1, 2}), EnCrecimiento);
-    EXPECT_EQ(s1.estadoDelCultivo({2, 0}), ConMaleza);
-    EXPECT_EQ(s1.estadoDelCultivo({2, 1}), ListoParaCosechar);
-    EXPECT_EQ(s1.estadoDelCultivo({2, 2}), EnCrecimiento);
+    EXPECT_EQ(RecienSembrado, s1.estadoDelCultivo({0, 2}));
+    EXPECT_EQ(NoSensado, s1.estadoDelCultivo({1, 0}));
+    EXPECT_EQ(RecienSembrado, s1.estadoDelCultivo({1, 1}));
+    EXPECT_EQ(EnCrecimiento, s1.estadoDelCultivo({1, 2}));
+    EXPECT_EQ(ConMaleza, s1.estadoDelCultivo({2, 0}));
+    EXPECT_EQ(ListoParaCosechar, s1.estadoDelCultivo({2, 1}));
+    EXPECT_EQ(EnCrecimiento, s1.estadoDelCultivo({2, 2}));
 
-    EXPECT_EQ(s1.campo(), campo_3x3);
-    EXPECT_TRUE(test::mismos(s1.enjambreDrones(), algunos_drones()));
+    EXPECT_EQ(campo_3x3, s1.campo());
+    EXPECT_TRUE(test::mismos(s1.enjambreDrones(), ds));
 }
 
 TEST(test_sistema_se_vino_la_maleza, se_pone_con_maleza_las_posiciones_de_la_lista) {
-    Campo campo_3x3({0, 0}, {0, 1}, {3, 3});
-    Sistema s1(campo_3x3, algunos_drones());
+    Posicion posG{0, 0};
+    Campo campo_3x3(posG, {0, 1}, {3, 3});
+    Secuencia<Drone> ds = algunos_drones_en_granero(posG);
+    Sistema s1(campo_3x3, ds);
 
     s1._estado.parcelas[0][2] = RecienSembrado;
     s1._estado.parcelas[1][0] = NoSensado;
@@ -44,14 +48,14 @@ TEST(test_sistema_se_vino_la_maleza, se_pone_con_maleza_las_posiciones_de_la_lis
     s1.seVinoLaMaleza({{0, 2},
                        {1, 2}});
 
-    EXPECT_EQ(s1.estadoDelCultivo({0, 2}), ConMaleza);
-    EXPECT_EQ(s1.estadoDelCultivo({1, 0}), NoSensado);
-    EXPECT_EQ(s1.estadoDelCultivo({1, 1}), RecienSembrado);
-    EXPECT_EQ(s1.estadoDelCultivo({1, 2}), ConMaleza);
-    EXPECT_EQ(s1.estadoDelCultivo({2, 0}), ConMaleza);
-    EXPECT_EQ(s1.estadoDelCultivo({2, 1}), ListoParaCosechar);
-    EXPECT_EQ(s1.estadoDelCultivo({2, 2}), EnCrecimiento);
+    EXPECT_EQ(ConMaleza, s1.estadoDelCultivo({0, 2}));
+    EXPECT_EQ(NoSensado, s1.estadoDelCultivo({1, 0}));
+    EXPECT_EQ(RecienSembrado, s1.estadoDelCultivo({1, 1}));
+    EXPECT_EQ(ConMaleza, s1.estadoDelCultivo({1, 2}));
+    EXPECT_EQ(ConMaleza, s1.estadoDelCultivo({2, 0}));
+    EXPECT_EQ(ListoParaCosechar, s1.estadoDelCultivo({2, 1}));
+    EXPECT_EQ(EnCrecimiento, s1.estadoDelCultivo({2, 2}));
 
-    EXPECT_EQ(s1.campo(), campo_3x3);
-    EXPECT_TRUE(test::mismos(s1.enjambreDrones(), algunos_drones()));
+    EXPECT_EQ(campo_3x3, s1.campo());
+    EXPECT_TRUE(test::mismos(s1.enjambreDrones(), ds));
 }

@@ -1,6 +1,6 @@
 #include "drone.h"
 #include "campo.h"
-#include "aux.h"
+#include "auxiliares.h"
 #include <ostream>
 
 Drone::Drone()

@@ -1,4 +1,4 @@
-#include "aux.h"
+#include "auxiliares.h"
 
 //Implementen aqui sus funciones auxiliares globales definidas en aux.h...
 using namespace std;
@@ -17,7 +17,7 @@ void imprimirLista(const Secuencia<std::string> & secuencia) {
 Secuencia<string> splitBy(const string cadena, const string delimiter) {
   Secuencia<string> partes;
   int inicio = 0;
-  int indice = 0;
+  unsigned int indice = 0;
   int cantidadLetras = 1;
   while (indice < cadena.length()) {
     if (cadena.compare(indice, delimiter.length(), delimiter) == 0) {
@@ -142,13 +142,15 @@ ostream &operator<<(ostream &os, const Dimension &d) {
   return os << "[" << d.ancho << "," << d.largo << "]";
 }
 
-EstadoCultivo dameEstadoCultivoDesdeString(const string estado) {
+EstadoCultivo dameEstadoCultivoDesdeString(const string estadoStr) {
   const char *estados[] = {"RecienSembrado", "EnCrecimiento", "ListoParaCosechar", "ConMaleza", "ConPlaga", "NoSensado"};
 	int n = 0;
+  EstadoCultivo estado;
   while (n < 6) { // era mas comodo poner el 6 que hacer un count del array!
-    if (estado.compare(estados[n]) == 0) {
-      return (EstadoCultivo) n;
+    if (estadoStr.compare(estados[n]) == 0) {
+      estado = (EstadoCultivo) n;
     }
     n++;
   }
+  return estado;
 }

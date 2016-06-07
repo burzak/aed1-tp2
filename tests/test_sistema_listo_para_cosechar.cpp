@@ -3,8 +3,9 @@
 #include "factories.h"
 
 TEST(test_sistema_listo_para_cosechar, si_es_menos_del_90_por_ciento_retorna_false) {
-    Campo campo_4x3({0, 0}, {0, 1}, {4, 3});
-    Sistema s1(campo_4x3, algunos_drones());
+    Posicion posG{0, 0};
+    Campo campo_4x3(posG, {0, 1}, {4, 3});
+    Sistema s1(campo_4x3, algunos_drones_en_granero(posG));
 
     s1._estado.parcelas[0][2] = ListoParaCosechar;
     s1._estado.parcelas[1][0] = ListoParaCosechar;
@@ -21,8 +22,9 @@ TEST(test_sistema_listo_para_cosechar, si_es_menos_del_90_por_ciento_retorna_fal
 }
 
 TEST(test_sistema_listo_para_cosechar, si_es_exactamente_el_90_por_ciento_retorna_true) {
-    Campo campo_4x3({0, 0}, {0, 1}, {4, 3});
-    Sistema s1(campo_4x3, algunos_drones());
+    Posicion posG{0, 0};
+    Campo campo_4x3(posG, {0, 1}, {4, 3});
+    Sistema s1(campo_4x3, algunos_drones_en_granero(posG));
 
     s1._estado.parcelas[0][2] = ListoParaCosechar;
     s1._estado.parcelas[1][0] = ListoParaCosechar;
@@ -39,8 +41,9 @@ TEST(test_sistema_listo_para_cosechar, si_es_exactamente_el_90_por_ciento_retorn
 }
 
 TEST(test_sistema_listo_para_cosechar, si_es_mas_del_90_por_ciento_retorna_true) {
-    Campo campo_4x3({0, 0}, {0, 1}, {4, 3});
-    Sistema s1(campo_4x3, algunos_drones());
+    Posicion posG{0, 0};
+    Campo campo_4x3(posG, {0, 1}, {4, 3});
+    Sistema s1(campo_4x3, algunos_drones_en_granero(posG));
 
     s1._estado.parcelas[0][2] = ListoParaCosechar;
     s1._estado.parcelas[1][0] = ListoParaCosechar;

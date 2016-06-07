@@ -2,7 +2,7 @@
 #include <fstream>
 #include "campo.h"
 #include "drone.h"
-#include "aux.h"
+#include "auxiliares.h"
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 #include <sistema.h>
 #include "gtest/gtest.h"
 #include "factories.h"
-#include "aux.h"
+#include "auxiliares.h"
 
 TEST(test_sistema_volar_y_sensar, todo_libre) {
     Posicion posG = {0, 0};
@@ -18,11 +18,12 @@ TEST(test_sistema_volar_y_sensar, todo_libre) {
     std::vector<std::vector<EstadoCultivo> > pre(s1._estado.parcelas);
     s1.volarYSensar(ds.back());
 
-    EXPECT_EQ(s1.campo(), c1);
+    EXPECT_EQ(c1, s1.campo());
     for (int i = 0; i < s1.campo().dimensiones().ancho; i++) {
         for (int j = 0; j < s1.campo().dimensiones().largo; j++) {
             if ((i == 0 && j == 1) || (i == 1 && j == 0)) continue;
-            EXPECT_EQ(s1.estadoDelCultivo({i, j}), pre[i][j]);
+            if (s1.campo().contenido(Posicion{i, j}) != Cultivo) continue;
+            EXPECT_EQ(pre[i][j], s1.estadoDelCultivo({i, j}));
         }
     }
     Drone pre_cambiado = ds.back();

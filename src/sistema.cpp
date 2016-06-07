@@ -1,6 +1,6 @@
 #include "sistema.h"
 #include "drone.h"
-#include "aux.h"
+#include "auxiliares.h"
 #include <algorithm>
 #include <sstream>
 #include <ostream>
@@ -23,7 +23,7 @@ Sistema::Sistema(const Campo & c, const Secuencia<Drone>& ds)
 	while (i < dim.ancho) {
 		int j = 0;
 		while (j < dim.largo) {
-			_estado.parcelas[i][j] = RecienSembrado;
+			_estado.parcelas[i][j] = NoSensado;
 			j++;
 		}
 		i++;
