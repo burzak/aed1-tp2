@@ -1,7 +1,10 @@
 #include "sistema.h"
+#include "aux.h"
 #include <algorithm>
 #include <sstream>
 #include <ostream>
+
+using namespace std;
 
 Sistema::Sistema()
 {
@@ -306,15 +309,89 @@ void Sistema::mostrar(std::ostream & os) const
 
 void Sistema::guardar(std::ostream & os) const
 {
+	os << "{ S ";
+	campo().guardar(os);
+	os << " [";
+	unsigned int n = 0;
+	Secuencia<Drone> enjambre = enjambreDrones();
+	while (n < enjambre.size()) {
+		enjambre[n].guardar(os);
+		n++;
+		if (n < enjambre.size()) {
+			os << ",";
+		}
+	}
+	os << "] [";
+	int x = 0;
+	Dimension dim = campo().dimensiones();
+	while (x < dim.ancho) {
+		int y = 0;
+		os << "[";
+		while (y < dim.largo) {
+			Posicion p;
+			p.x = x;
+			p.y = y;
+			os << estadoDelCultivo(p);
+			y++;
+			if (y < dim.largo) {
+				os << ",";
+			}
+		}
+		os << "]";
+		x++;
+		if (x < dim.ancho) {
+			os << ",";
+		}
+	}
+	os << "]}";
 }
 
 void Sistema::cargar(std::istream & is)
 {
-  std::string raw;
+	std::string non;
+	getline(is, non, '{');
+	getline(is, non, '{');
+	is.putback('{');
+	_campo.cargar(is);
 
-  // process positions
-  std::stringstream nuevo;
-  nuevo.str(raw.c_str());
+	char c;
+	while (c != ']') {
+		is.get(c);
+		if (c == '{') {
+			is.putback('{');
+			Drone d;
+			d.cargar(is);
+			_enjambre.push_back(d);
+		}
+	}
+
+	getline(is, non);
+	Secuencia<std::string> estadosCultivosFilas;
+	// con el substr saco el " " inicial!
+	estadosCultivosFilas = cargarLista(non.substr(1, non.length()-2), "[", "]");
+
+	Secuencia<std::string> todosEstadosCultivos;
+
+	int n = 0;
+	while (n < estadosCultivosFilas.size()) {
+		Secuencia<string> tmp = splitBy(estadosCultivosFilas[n].substr(1, estadosCultivosFilas[n].length() - 2), ",");
+		todosEstadosCultivos.insert(todosEstadosCultivos.end(), tmp.begin(), tmp.end());
+		n++;
+	}
+	Dimension dim;
+	dim.ancho = estadosCultivosFilas.size();
+	dim.largo = todosEstadosCultivos.size() / estadosCultivosFilas.size();
+	_estado = Grilla<EstadoCultivo>(dim);
+
+	int x = 0;
+	while (x < dim.ancho) {
+		int y = 0;
+		while (y < dim.largo) {
+			_estado.parcelas[x][y] = dameEstadoCultivoDesdeString(todosEstadosCultivos[x*dim.ancho+y]);
+			y++;
+		}
+		x++;
+	}
 }
 
 bool Sistema::operator==(const Sistema & otroSistema) const

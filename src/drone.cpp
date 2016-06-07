@@ -155,9 +155,9 @@ void Drone::guardar(std::ostream & os) const
 
 void Drone::cargar(std::istream & is)
 {
-  std::string raw;
-  getline(is, raw, '}');
-  Secuencia<std::string> datos = splitBy(raw.substr(1, raw.length()-2), " ");
+	std::string raw;
+	getline(is, raw, '}');
+	Secuencia<std::string> datos = splitBy(raw.substr(1, raw.length()-1), " ");
 
   _id = atoi(datos[1].c_str());
   setBateria(atoi(datos[2].c_str()));
@@ -168,9 +168,13 @@ void Drone::cargar(std::istream & is)
   }
 
   // dato[3] tiene [[1,2],[1,3]] y yo quiero sacar los [] que encierran a todos los datos
-  _trayectoria = damePosiciones(datos[3].substr(1, datos[3].length()-2));
+	if (datos[3].length() > 2) {
+		_trayectoria = damePosiciones(datos[3].substr(1, datos[3].length()-2));
+	}
   _posicionActual = damePosiciones(datos[6])[0];
-  _productos = dameProductos(datos[4].substr(1, datos[4].length()-2));
+	if (datos[4].length() > 2) {
+		_productos = dameProductos(datos[4].substr(1, datos[4].length()-2));
+	}
 }
 
 void Drone::moverA(const Posicion pos)

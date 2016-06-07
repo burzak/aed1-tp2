@@ -4,10 +4,11 @@
 using namespace std;
 
 
-void imprimirLista(const Secuencia<string> secuencia) {
+void imprimirLista(const Secuencia<std::string> & secuencia) {
   unsigned int n = 0;
+  unsigned int size = secuencia.size();
   cout << endl << "Lista:" << endl;
-  while (n < secuencia.size()) {
+  while (n < size) {
     cout << "-" << secuencia[n] << "-" << endl;
     n++;
   }
@@ -99,7 +100,6 @@ Secuencia<string> cargarLista(const string listaStr, const string caracterComien
   unsigned int contador = 0;
   while (index < listaStr.length()) {
     string actual = listaStr.substr(index, 1);
-    cout << actual;
     if (actual.compare(",") == 0 && contador == 1) {
       lista.push_back(listaStr.substr(inicio, cantidad));
       cantidad = 0;
@@ -140,4 +140,15 @@ Grilla<Parcela> crearGrilla(Dimension dimension) {
 
 ostream &operator<<(ostream &os, const Dimension &d) {
   return os << "[" << d.ancho << "," << d.largo << "]";
+}
+
+EstadoCultivo dameEstadoCultivoDesdeString(const string estado) {
+  const char *estados[] = {"RecienSembrado", "EnCrecimiento", "ListoParaCosechar", "ConMaleza", "ConPlaga", "NoSensado"};
+	int n = 0;
+  while (n < 6) { // era mas comodo poner el 6 que hacer un count del array!
+    if (estado.compare(estados[n]) == 0) {
+      return (EstadoCultivo) n;
+    }
+    n++;
+  }
 }

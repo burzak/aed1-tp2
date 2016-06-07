@@ -78,7 +78,7 @@ void Campo::cargar(std::istream & is)
 {
   std::string raw;
   getline(is, raw, '}');
-  Secuencia<std::string> datos = splitBy(raw.substr(1, raw.length()-2), " ");
+  Secuencia<std::string> datos = splitBy(raw.substr(1, raw.length()-1), " ");
 
   // reutilizo la funcion damePosicion para cargar la Dimension, es el mismo formato solo cambia el tipo
   Posicion dim = damePosiciones(datos[1])[0];
@@ -90,14 +90,21 @@ void Campo::cargar(std::istream & is)
   Secuencia<std::string> lista = cargarLista(datos[2], "[", "]");
   unsigned int n=0;
   while (n < lista.size()) {
-    std::cout << lista[n];
     Secuencia<std::string> productos = cargarLista(lista[n], "[", "]");
     unsigned int j = 0;
     while (j < productos.size()) {
       if (productos[j].compare("Casa") == 0) {
+				Posicion posC;
+				posC.x = n;
+				posC.y = j;
+				_posC = posC;
         _grilla.parcelas[n][j] = Casa;
       }
       if (productos[j].compare("Granero") == 0) {
+				Posicion posG;
+				posG.x = n;
+				posG.y = j;
+				_posG = posG;
         _grilla.parcelas[n][j] = Granero;
       }
       j++;
