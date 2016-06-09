@@ -4,27 +4,27 @@
 #include "tipos.h"
 
 class Campo {
-	public:
-		Campo();
-		Campo(const Posicion &posG, const Posicion &posC);
-    	Campo(const Posicion &posG, const Posicion &posC, Dimension dimension); // no usar!!!!!
+  public:
+    Campo();
+    Campo(const Posicion &posG, const Posicion &posC);
+      Campo(const Posicion &posG, const Posicion &posC, Dimension dimension); // no usar!!!!!
 
-		Dimension dimensiones() const;
-		Parcela contenido(const Posicion &pos) const;
+    Dimension dimensiones() const;
+    Parcela contenido(const Posicion &pos) const;
 
-		void mostrar(std::ostream& os) const;
-		void guardar(std::ostream& os) const;
-		void cargar (std::istream& is);
+    void mostrar(std::ostream& os) const;
+    void guardar(std::ostream& os) const;
+    void cargar (std::istream& is);
 
-		bool operator==(const Campo& otroCampo) const;
+    bool operator==(const Campo& otroCampo) const;
 
-	private:
-		Dimension _dimension;
-		Grilla<Parcela> _grilla;
+  private:
+    Dimension _dimension;
+    Grilla<Parcela> _grilla;
 
-		// Variables privadas que agregamos nosotros:
-		Posicion _posG;
-		Posicion _posC;
+    // Variables privadas que agregamos nosotros:
+    Posicion _posG;
+    Posicion _posC;
 };
 
 // Definirlo usando mostrar, para poder usar << con este tipo.

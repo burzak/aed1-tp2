@@ -163,6 +163,6 @@ problema restarPosiciones(pos1, pos2: Posicion) = res: Posicion {
 Posicion restarPosiciones(const Posicion & pos1, const Posicion & pos2) {
   Posicion p;
   p.x = pos2.x - pos1.x;
-  p.y = pos2.y - pos2.y;
+  p.y = pos2.y - pos1.y;
   return p;
 }
