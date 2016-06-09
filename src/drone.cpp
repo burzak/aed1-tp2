@@ -52,11 +52,11 @@ const Secuencia<Producto>& Drone::productosDisponibles() const
 bool Drone::vueloEscalerado() const
 {
   // E0
-  bool res = _enVuelo;
+  bool res = enVuelo();
   // E1
   Secuencia<Posicion> posiciones = vueloRealizado();
   //E2
-  if (posiciones.size() > 2) {
+  if (posiciones.size() > 2 && enVuelo()) {
     //E-IF0
     Posicion distancia1a3 = restarPosiciones(posiciones[0], posiciones[2]);
     //E-IF1
