@@ -135,33 +135,37 @@ void Sistema::despegar(const Drone & d)
 
 bool Sistema::listoParaCosechar() const
 {
+  //E0
   int i = 0;
+  //E1
+  Dimension dim = campo().dimensiones();
+  //E2
   float parcelasListas = 0;
-  float cantidadParcelas = 0;
-
-  //En vez de contar cantidadParcelas podemos hacer ancho * largo
-  while (i < campo().dimensiones().ancho){
-    int j = 0;
-    while (j < campo().dimensiones().largo){
-      Posicion pos;
-      pos.x = i;
-      pos.y = j;
-      if(campo().contenido(pos) == Cultivo){
-        if (estadoDelCultivo(pos) == ListoParaCosechar){
-        //if (estadoDelCultivo(pos) == ListoParaCosechar){
-          parcelasListas++;
-        }
-        cantidadParcelas++;
-      }
-      j++;
+  //E3
+  float cantidadParcelas = dim.ancho * dim.largo;
+  //E4
+  while (i < cantidadParcelas){
+    //E-C0
+    Posicion pos{i/dim.largo, i % dim.largo};
+    //E-C1
+    if(campo().contenido(pos) == Cultivo && estadoDelCultivo(pos) == ListoParaCosechar){
+      //E-CIF-1
+      parcelasListas++;
+      //E-CIF-2
     }
+    //E-C2
     i++;
+    //E-C3
   }
+  
+  //E5
   //Magia matematica para no comparar floats.
-  int res = (parcelasListas/cantidadParcelas)*100;
+  //cantidadParcelas es ancho*alto del campo menos la casa y el granero => (ancho*largo) - 2
+  int res = (parcelasListas/(cantidadParcelas-2))*100;
 
+  //E6
   return res >= 90;
-
+  //E7
 }
 
 void Sistema::aterrizarYCargarBaterias(Carga b)
