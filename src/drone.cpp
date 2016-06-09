@@ -60,8 +60,6 @@ bool Drone::vueloEscalerado() const
     //E-IF0
     Posicion distancia1a3 = restarPosiciones(posiciones[0], posiciones[2]);
     //E-IF1
-    res = res && distancia1a3.x != 0 && distancia1a3.y != 0;
-    //E-IF2
     int i = 0;
     //E-IF3
     while (i < (int) posiciones.size() - 2) {
@@ -74,6 +72,8 @@ bool Drone::vueloEscalerado() const
       //E-C3
     }
     //E-IF4
+    res = res && distancia1a3.x != 0 && distancia1a3.y != 0;
+    //E-IF5
   }
   //E3
   return res;
