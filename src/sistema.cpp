@@ -16,9 +16,9 @@ Sistema::Sistema(const Campo & c, const Secuencia<Drone>& ds)
 	_campo = c;
 	Dimension dim = _campo.dimensiones();
 
-	// revisar/preguntar porque no podemos pasarle las dimensiones a Grilla
 	_estado = Grilla<EstadoCultivo>(dim);
 
+  // no hay nada sensado todavia
 	int i = 0;
 	while (i < dim.ancho) {
 		int j = 0;
@@ -245,12 +245,14 @@ void Sistema::volarYSensar(const Drone & d)
 	while (i < enjambreDrones().size()){
 		if (enjambreDrones()[i].id() == d.id()){
 			//Como quiero modificarlo tengo que usar _enjambre, no enjambreDeDrones() no?
+			//Porque enjambreDrones devuelve algo que no se puede modificar por el const
 			//Asigno por referencia para poder modificar el drone en cuestion
 			indiceDrone = i;
 		}
 		i++;
 	}
 
+  //agarro el drone correcto
 	Drone& drone = _enjambre[indiceDrone];
 	int posX = drone.posicionActual().x;
 	int posY = drone.posicionActual().y;
@@ -355,9 +357,12 @@ void Sistema::cargar(std::istream & is)
 	getline(is, non, '{');
 	getline(is, non, '{');
 	is.putback('{');
+  //cargo el campo
 	_campo.cargar(is);
 
 	// cargo todos los drones
+  // adelanto hasta encontrar donde empieza cada drone ({) o hasta llegar al ] que
+  // es donde termina la lista de drones
 	char c;
 	while (c != ']') {
 		is.get(c);
@@ -375,6 +380,8 @@ void Sistema::cargar(std::istream & is)
 	// con el substr saco el " " inicial y el } final!
 	estadosCultivosFilas = cargarLista(non.substr(1, non.length()-2), "[", "]");
 
+  // este vector va a tener todos los estados pero "aplanado", todos en hilera
+  // y cuando los asigne voy accediendolo como todosEstadosCultivos[n_fila*ancho + posicion en Y]
 	Secuencia<std::string> todosEstadosCultivos;
 
 	int n = 0;
@@ -383,11 +390,14 @@ void Sistema::cargar(std::istream & is)
 		todosEstadosCultivos.insert(todosEstadosCultivos.end(), tmp.begin(), tmp.end());
 		n++;
 	}
+
+  // creo la grilla de estados con las dimensiones correctas
 	Dimension dim;
 	dim.ancho = estadosCultivosFilas.size();
 	dim.largo = todosEstadosCultivos.size() / estadosCultivosFilas.size();
 	_estado = Grilla<EstadoCultivo>(dim);
 
+  // asigno todos los estados dentro de la grilla
 	int x = 0;
 	while (x < dim.ancho) {
 		int y = 0;
@@ -397,6 +407,7 @@ void Sistema::cargar(std::istream & is)
 		}
 		x++;
 	}
+  //gane :)
 }
 
 bool Sistema::operator==(const Sistema & otroSistema) const
