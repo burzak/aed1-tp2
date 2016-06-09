@@ -51,21 +51,33 @@ const Secuencia<Producto>& Drone::productosDisponibles() const
 
 bool Drone::vueloEscalerado() const
 {
+  // E0
 	bool res = _enVuelo;
-
-	int i = 0;
-	while (i+2 < (int) _trayectoria.size()) {
-		int distanciaX = (_trayectoria[2].x - _trayectoria[0].x);
-		int distanciaY = (_trayectoria[2].y - _trayectoria[0].y);
-
-		int coord1 = (_trayectoria[i+2].x - _trayectoria[i].x);
-		int coord2 = (_trayectoria[i+2].y - _trayectoria[i].y);
-
-		res = res && distanciaX == coord1 && distanciaY == coord2 && coord1 != 0 && coord2 != 0;
-		i++;
-	}
-
+  // E1
+  Secuencia<Posicion> posiciones = vueloRealizado();
+  //E2
+  if (posiciones.size() > 2) {
+    //E-IF0
+    Posicion distancia1a3 = restarPosiciones(posiciones[0], posiciones[2]);
+    //E-IF1
+    res = res && distancia1a3 != 0 && distancia1a3 != 0;
+    //E-IF2
+    int i = 0;
+    //E-IF3
+  	while (i < (int) posiciones.size() - 2) {
+      //E-C0
+  		Posicion distanciaDeADos = restarPosiciones(posiciones[i], posiciones[i+2]);
+      //E-C1
+  		res = res && distanciaDeADos == distancia1a3;
+      //E-C2
+  		i++;
+      //E-C3
+  	}
+    //E-IF4
+  }
+  //E3
 	return res;
+  //E4
 }
 
 Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)

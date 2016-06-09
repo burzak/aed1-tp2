@@ -154,3 +154,15 @@ EstadoCultivo dameEstadoCultivoDesdeString(const string estadoStr) {
   }
   return estado;
 }
+
+/*
+problema restarPosiciones(pos1, pos2: Posicion) = res: Posicion {
+  asegura prm(res) == prm(pos2) - prm(pos1) ^ sgd(res) == sgd(pos2) - sgd(pos1);
+}
+*/
+Posicion restarPosiciones(const Posicion & pos1, const Posicion & pos2) {
+  Posicion p;
+  p.x = pos2.x - pos1.x;
+  p.y = pos2.y - pos2.y;
+  return p;
+}

@@ -11,6 +11,8 @@ Secuencia<std::string> cargarLista(const std::string listaStr, const std::string
 Grilla<Parcela> crearGrilla(Dimension dimension);
 EstadoCultivo dameEstadoCultivoDesdeString(const std::string estadoStr);
 
+Posicion restarPosiciones(const Posicion & pos1, const Posicion & pos2);
+
 void imprimirLista(const Secuencia<std::string> & secuencia);
 
 std::ostream &operator<<(std::ostream &os, const Dimension &d);
