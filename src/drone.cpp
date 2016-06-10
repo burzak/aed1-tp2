@@ -83,10 +83,15 @@ bool Drone::vueloEscalerado() const
 Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
 {
   Secuencia<InfoVueloCruzado> vuelosCruzados;
+
+  //Usamos unsigned int para evitar warnings al compilar (size() de vector devuelve unsigned int)
   unsigned int n = 0;
   while (n < ds.size()) {
     unsigned int j = 0;
     while (j < ds[n].vueloRealizado().size()) {
+      /*Buscamos todos los cruces en las posiciones contenidas en vueloRealizados() de todos
+      los drones. Produce un vector de info desordenada y con muchos elementos repetidos.
+      Luego de formar el vector hay que encargarse de ordenar y eliminar repetidos*/
       if (cantidadCruces(ds, ds[n].vueloRealizado()[j], ds[n].vueloRealizado().size()) > 1) {
         InfoVueloCruzado info;
         info.posicion = ds[n].vueloRealizado()[j];
@@ -98,7 +103,7 @@ Secuencia<InfoVueloCruzado> Drone::vuelosCruzados(const Secuencia<Drone>& ds)
     n++;
   }
 
-  //hay que sacar repetidos y todo eso
+  //Ordenamos y sacamos repetidos.
   Secuencia<InfoVueloCruzado> res = elimCruzadosRepetidos(vuelosCruzados);
   ordenarVuelosCruzados(res);
   return res;
@@ -296,6 +301,10 @@ int Drone::cantidadCruces(const Secuencia<Drone>& ds, Posicion pos, int longitud
       }
       j++;
     }
+    /*Si hubo mas de un drone al mismo tiempo en una posicion se considera
+    cruce y la cantidad de drones involucrados en el cruce se suma al total
+    de drones que se cruzaron en esa posicion (acumula todos los que se
+    cruzaron en momentos distintos)*/
     if (cant > 1) {
       total = total + cant;
     }
@@ -324,6 +333,8 @@ void Drone::ordenarVuelosCruzados(Secuencia<InfoVueloCruzado>& vuelosCruzados){
 }
 
 Secuencia<InfoVueloCruzado> Drone::elimCruzadosRepetidos(const Secuencia<InfoVueloCruzado>& vuelosCruzados){
+  /*Creamos una lista nueva porque ir modificando la lista original mientras
+  hacemos consultas sobre ella podría traer problemas*/ 
   Secuencia<InfoVueloCruzado> res;
 
   unsigned int i = 0;

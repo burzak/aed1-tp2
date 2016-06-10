@@ -7,7 +7,7 @@ Campo::Campo()
 
 Campo::Campo(const Posicion &posG, const Posicion &posC)
 {
-  // Revisarlo para que se cumpla el invariante posicionesAlcanzablesEn100
+  //Sumamos 1 porque las coordenadas empiezan en 0 y las dimensiones en 1
   _dimension.ancho = std::max(posG.x + 1, posC.x + 1);
   _dimension.largo = std::max(posG.y + 1, posC.y + 1);
 

@@ -56,6 +56,7 @@ void Sistema::crecer()
       Posicion pos;
       pos.x = i;
       pos.y = j;
+      //No hace falta ver si esta en rango porque empieza en 0 y llega a dim -1.
       if (campo().contenido(pos) == Cultivo){
         if (estadoDelCultivo(pos) == RecienSembrado){
           _estado.parcelas[i][j] = EnCrecimiento;
@@ -72,6 +73,8 @@ void Sistema::crecer()
 
 void Sistema::seVinoLaMaleza(const Secuencia<Posicion>& ps)
 {
+  /*Por requiere deben ser todas posiciones validas, entonces no hace falta 
+  chequear nada*/
   unsigned int i = 0;
   while(i < ps.size()){
     _estado.parcelas[ps[i].x][ps[i].y] = ConMaleza;
@@ -81,8 +84,12 @@ void Sistema::seVinoLaMaleza(const Secuencia<Posicion>& ps)
 
 void Sistema::seExpandePlaga()
 {
-  //Probablemente haya que arreglar porque estoy expandiendo la plaga al mismo tiempo que chequeo
   int i = 0;
+  /*Sacamos una "foto" del estado del sistema antes de modificarlo para
+  usarla como referencia. Si modificaramos directamente la grilla del
+  sistema mientras evaluamos que parcelas tienen plaga ocurre que 
+  la plagas "nuevas" tambien se expanden en la direccion en la que
+  evaluamos la grilla*/
   Grilla<EstadoCultivo> estado0 = _estado;
   while (i < campo().dimensiones().ancho){
     int j = 0;
@@ -103,8 +110,9 @@ void Sistema::despegar(const Drone & d)
   Posicion pos;
   bool seMueve = false;
 
+  /*Siempre que se hace una consulta sobre parcelas vecinas es importante
+  ver que esten en rango.*/
   if (enRangoCultivableLibre(d.posicionActual().x - 1, d.posicionActual().y)){
-      //enRango(d.posicionActual().x - 1, d.posicionActual().y)){
     pos.x = d.posicionActual().x - 1;
     pos.y = d.posicionActual().y;
     seMueve = true;
@@ -183,13 +191,14 @@ void Sistema::aterrizarYCargarBaterias(Carga b)
 
 void Sistema::fertilizarPorFilas()
 {
+  //Por requiere solo hay un drone por fila, evaluamos con la coordenada y.
   unsigned int i = 0;
   while (i < campo().dimensiones().largo){
     unsigned int pasos = 0;
     pasos = pasosIzquierdaPosibles(i);
 
 
-    //Busco el drone para modificarlo
+    //Buscamos el drone para modificarlo
     int indiceDrone;
     unsigned int j = 0;
     while (j < _enjambre.size()){
@@ -201,7 +210,8 @@ void Sistema::fertilizarPorFilas()
 
     int posXIni = _enjambre[indiceDrone].posicionActual().x;
 
-    //Fertilizo las parcelas por las que paso y veo cuanto fertilizante hay que sacar.
+    /*Fertilizamos las parcelas por las que pasa el drone y vemos cuanto
+    fertilizante hay que sacar.*/
     int fertUsado = 0;
     j = 0;
     while(j < pasos){
@@ -226,6 +236,7 @@ void Sistema::fertilizarPorFilas()
 
     _enjambre[indiceDrone].setBateria(_enjambre[indiceDrone].bateria() - pasos);
 
+    //Se mueve el drone.
     j = 0;
     while(j <= posXIni){
       Posicion pos;
@@ -244,28 +255,25 @@ void Sistema::volarYSensar(const Drone & d)
   unsigned int i = 0;
   int indiceDrone;
 
-  //Hay que buscar un dron equivalente al que nos dieron en el enjambre del sistema.
-  //Por invariante y requiere deberia siempre encontrarlo y ser unico.
+  /*Hay que buscar un dron equivalente al que nos dieron en el enjambre del
+  sistema. Por invariante y requiere deberia siempre encontrarlo y ser unico.
+  */
   while (i < enjambreDrones().size()){
     if (enjambreDrones()[i].id() == d.id()){
-      //Como quiero modificarlo tengo que usar _enjambre, no enjambreDeDrones() no?
-      //Porque enjambreDrones devuelve algo que no se puede modificar por el const
-      //Asigno por referencia para poder modificar el drone en cuestion
+      /*Como queremos modificarlo tenemos que usar _enjambre, no enjambreDeDrones()
+      porque enajambreDeDrones() devuelve un const.
+      Asignamos por referencia para poder modificar el drone en cuestion*/
       indiceDrone = i;
     }
     i++;
   }
 
-  //agarro el drone correcto
   Drone& drone = _enjambre[indiceDrone];
   int posX = drone.posicionActual().x;
   int posY = drone.posicionActual().y;
   bool seMovio = false;
 
-  //El granero cuenta como parcelaDisponible? Falta la aux en la especificacion
-
   Posicion targetPos;
-  //Estos muchos ifs no me gustan demasiado
   if (drone.bateria() >0 && enRangoCultivableLibre(posX + 1, posY)){
     targetPos.x = posX + 1;
     targetPos.y = posY;
@@ -295,18 +303,16 @@ void Sistema::volarYSensar(const Drone & d)
     seMovio = true;
   }
 
-  //Si la parcela esta noSensada se le puede poner cualquier verdura (eh, entienden? Cualquier verdura para cultivar!)
-
+  /*Si la parcela esta noSensada se le puede poner cualquier verdura
+  (eh, entienden? Cualquier verdura para cultivar!)*/
   if(seMovio == true){
     modificarCultivoYDrone(targetPos, drone);
   }
 
 }
 
+  //drone.moverA() no cambia la bateria
 
-  /***RECORDAR***/
-  //Cambiar bateria cuando se mueve (drone.moverA() no cambia la bateria)
-  //Cambiar la bateria cuando se aplica un producto o similar
 
 
 
@@ -445,7 +451,7 @@ std::ostream & operator<<(std::ostream & os, const Sistema & s)
 
 /********************** AUX *****************************/
 bool Sistema::enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const{
-  bool res = true;
+  bool res = false;
   Posicion pos;
   pos.x = x;
   pos.y = y;
@@ -454,12 +460,6 @@ bool Sistema::enRangoConPlaga(int x, int y, Grilla<EstadoCultivo> estado0) const
     if(campo().contenido(pos) == Cultivo){
       res = estado0.parcelas[x][y] == ConPlaga;
     }
-    else{
-      res = false;
-    }
-  }
-  else{
-    res = false;
   }
   return res;
 }
@@ -541,6 +541,7 @@ Posicion Sistema::posG() const{
 int Sistema::pasosIzquierdaPosibles(int y){
   Drone d;
 
+  //Buscamos el drone
   int i = 0;
   while (i < enjambreDrones().size()){
     if (enjambreDrones()[i].posicionActual().y == y){
@@ -549,10 +550,17 @@ int Sistema::pasosIzquierdaPosibles(int y){
     i++;
   }
 
+  /*La cantidad de pasos posibles pueden depender de la cantidad de
+  fertilizante, de bateria, a que distancia se encuentra del limite
+  del campo o de una casa o granero. Evaluamos cada caso por separado
+  y luego los comparamos.*/
+
   int posX = d.posicionActual().x;
 
+  //Empezamos a buscar en posX y nos movemos hacia la izquierda (restamos)
   i = posX;
-  //Los inicializo en -1 para que en caso que no haya ni G ni C en la fila se pueda usar como limite
+  /*Los inicializamos en -1 para que en caso que no haya ni G ni C en la fila
+  se pueda usar como limite*/
   int xGranero = -1;
   int xCasa = -1;
   while (i >= 0){
@@ -568,6 +576,7 @@ int Sistema::pasosIzquierdaPosibles(int y){
     i--;
   }
 
+  //Vemos cuanto fertilizante tenemos disponible
   int fertilizante = 0;
   i = 0;
   while(i < d.productosDisponibles().size()){
@@ -577,6 +586,7 @@ int Sistema::pasosIzquierdaPosibles(int y){
     i++;
   }
 
+  //Vemos cuantos pasos se pueden dar con la cantidad disponible de fertilizante
   i = posX;
   int pasosFert = 0;
   while(i > mayor(xCasa, xGranero)){
